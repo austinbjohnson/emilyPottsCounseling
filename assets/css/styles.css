@@ -137,9 +137,11 @@ h4 {
 
 .hero-image {
   width: 100%;
+  height: clamp(200px, 32vw, 320px);
   border-radius: 16px;
   margin-bottom: 1.2rem;
   object-fit: cover;
+  object-position: center;
 }
 
 .hero-card h1 {
@@ -181,15 +183,14 @@ h4 {
 
 .feature-image {
   width: 100%;
+  height: clamp(240px, 45vw, 420px);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin: 1.5rem 0;
   object-fit: cover;
+  object-position: center;
 }
 
-.feature-image.tall {
-  max-height: 520px;
-}
 
 .card h3 {
   font-size: 1.3rem;
@@ -321,6 +322,7 @@ details[open] {
   height: 200px;
   width: 100%;
   object-fit: cover;
+  object-position: center top;
 }
 
 .blog-card .content {
