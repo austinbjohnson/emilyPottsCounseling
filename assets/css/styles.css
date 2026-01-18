@@ -135,6 +135,13 @@ h4 {
   box-shadow: var(--shadow);
 }
 
+.hero-image {
+  width: 100%;
+  border-radius: 16px;
+  margin-bottom: 1.2rem;
+  object-fit: cover;
+}
+
 .hero-card h1 {
   font-size: clamp(2.2rem, 4vw, 3.5rem);
 }
@@ -170,6 +177,18 @@ h4 {
   border-radius: var(--radius);
   background: #fff;
   box-shadow: 0 12px 35px rgba(63, 65, 60, 0.08);
+}
+
+.feature-image {
+  width: 100%;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 1.5rem 0;
+  object-fit: cover;
+}
+
+.feature-image.tall {
+  max-height: 520px;
 }
 
 .card h3 {
