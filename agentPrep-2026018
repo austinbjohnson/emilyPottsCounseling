@@ -1,0 +1,229 @@
+I looked through emilypotts.ca enough to map the site + identify what would need to be rebuilt to run it as a static GitHub Pages site (vs. “just download + reupload Squarespace”). The site is currently a Squarespace build (images are served from images.squarespace-cdn.com), with the main functionality being content pages + external links for newsletter and booking.  ￼
+
+What’s on emilypotts.ca right now (so you know what you’re rebuilding)
+
+Core pages / content
+
+From the site navigation + content, the “static rebuild” surface area is basically:
+	•	Home (/) with hero + intro + 3 service tiles (Therapy / Speaking / Workshops) + CTA sections.  ￼
+	•	About (/about) with bio, qualifications, and multiple images.  ￼
+	•	Services & Fees (/services-and-fees) with service descriptions and pricing (e.g., 50-minute session price listed on-page).  ￼
+	•	Therapy (/therapy) with “Climate Aware Therapy” section and bullet points.  ￼
+	•	FAQs (/faqs) with accordion-style Q&A content.  ￼
+	•	Resources index (/resources) listing two posts.  ￼
+	•	Resource post 1 (/resources/Blog%20Post%20Title%20One-y2epy-y63ns) (note the odd slug with spaces encoded).  ￼
+	•	Resource post 2 (/resources/exploring-solutions-for-climate-anxiety).  ￼
+	•	Contact (/contact) with copy + a “Book a free 15-minute call” button linking to JaneApp, and a “fill out the form below” section (likely a Squarespace form you’ll need to replace).  ￼
+	•	Privacy policy (/privacy-page) long-form privacy notice.  ￼
+
+External integrations (these are easy to keep)
+	•	Newsletter goes to Substack (areyouok.substack.com).  ￼
+	•	Book Now goes to JaneApp (peakresilience.janeapp.com).  ￼
+
+Media / assets reality
+	•	Images are hosted on Squarespace’s CDN right now (you should download and re-host them in the GitHub repo, otherwise they may disappear or break when the Squarespace site is cancelled).  ￼
+
+One red flag to verify in a real browser
+	•	The footer includes a “Speaking” link, but my tool couldn’t reliably fetch /speaking (could be a temporary fetch issue, a redirect, or a broken link). Put “check speaking URL + any hidden pages” into your first-pass QA list.  ￼
+
+The practical approach: “rebuild from reference,” not “clone Squarespace output”
+
+If your goal is “the exact same website” visually + structurally, do this:
+	•	Treat the current site as the spec (layout, typography, spacing, components).
+	•	Recreate the layout with your own:
+	•	header / nav component
+	•	footer component
+	•	a small set of reusable “section” patterns (hero, 2-column image/text, tile grid, CTA band, quote block, blog list, blog post template)
+	•	Migrate the content into those templates.
+	•	Replace Squarespace-only features (forms) with static-friendly alternatives.
+
+This yields nearly the same look, avoids Squarespace code reuse issues, and is maintainable on GitHub Pages.
+
+Action plan for tomorrow morning (GitHub Pages migration sprint)
+
+0) Pre-flight checks (15–20 min)
+
+Goal: avoid breaking domain/email/privacy.
+	•	Confirm you have:
+	•	Emily’s explicit OK to copy her content + publish on GitHub Pages.
+	•	Access to domain DNS (wherever emilypotts.ca is managed).
+	•	Whether she uses domain email (MX records). You must preserve MX/TXT if she does.
+	•	Decide: preview-first vs cutover today
+	•	Recommended: publish a preview on *.github.io first, get sign-off, then cutover DNS later.
+
+1) Inventory the site (20–30 min)
+
+Goal: don’t miss a page or break URLs.
+
+Create a quick checklist of URLs to reproduce exactly:
+	•	/
+	•	/about
+	•	/services-and-fees
+	•	/therapy
+	•	/faqs
+	•	/resources
+	•	/resources/Blog%20Post%20Title%20One-y2epy-y63ns
+	•	/resources/exploring-solutions-for-climate-anxiety
+	•	/contact
+	•	/privacy-page  ￼
+
+Also add:
+	•	Any “hidden” pages you find in the Squarespace admin (sometimes there are unlinked pages)
+	•	The “Speaking” link destination (verify actual URL in browser)  ￼
+
+2) Scrape/backup content safely (30–45 min)
+
+Goal: get a local backup of text + images before anyone cancels Squarespace.
+
+Do this on your own machine (not in ChatGPT), with permission:
+	•	Use a mirroring tool to capture pages + assets as a backup/reference (not as final deployable code). Example:
+
+mkdir -p backup
+wget \
+  --mirror --page-requisites --adjust-extension --convert-links \
+  --span-hosts --no-parent \
+  --domains emilypotts.ca,images.squarespace-cdn.com \
+  -P backup \
+  https://emilypotts.ca/
+
+Notes:
+	•	This helps you grab the images and copy, but don’t assume the mirrored HTML is clean or legally reusable.
+
+Also: manually save the key images Emily owns (her portrait shots, any custom graphics) into an assets/ folder.
+
+3) Choose the build style (5 min decision)
+
+You have two solid options:
+
+Option A: Plain HTML + CSS (fastest, least magic)
+	•	Best if you want tight control and zero Jekyll weirdness.
+	•	Works perfectly on GitHub Pages.
+
+Option B: Jekyll (still simple, nicer for repeated header/footer + blog)
+	•	GitHub Pages supports Jekyll natively.
+	•	Makes “Resources” posts easier if she’ll add more.
+
+If you’re trying to finish the core rebuild in a morning, I’d pick Option A unless Emily will actively blog.
+
+4) Build the repo skeleton (20–30 min)
+
+Goal: working site structure + routing that matches the current URLs.
+
+Suggested structure (plain HTML version):
+
+/
+  index.html
+  about/index.html
+  services-and-fees/index.html
+  therapy/index.html
+  faqs/index.html
+  resources/index.html
+  resources/
+    Blog Post Title One-y2epy-y63ns/index.html
+    exploring-solutions-for-climate-anxiety/index.html
+  contact/index.html
+  privacy-page/index.html
+  assets/
+    css/styles.css
+    img/...
+
+Yes, that weird “Blog Post Title One-y2epy-y63ns” folder name with spaces is awkward, but it matches the live URL (%20 in the URL = spaces in the folder name).  ￼
+
+5) Recreate global components (30–45 min)
+
+Goal: every page shares the same top + bottom.
+	•	Header/nav links:
+	•	About → /about/
+	•	Services & Fees → /services-and-fees/
+	•	Resources → /resources/
+	•	FAQs → /faqs/
+	•	Contact → /contact/
+	•	Newsletter → Substack external
+	•	Book Now → JaneApp external  ￼
+	•	Footer:
+	•	Crisis line copy (BC Crisis Centre number appears across pages)  ￼
+	•	Land acknowledgement text (appears in footer)  ￼
+	•	Privacy Policy link → /privacy-page/  ￼
+
+6) Port page content (60–90 min)
+
+Goal: content parity with the current site.
+
+Do it in this order:
+	1.	Home  ￼
+	2.	About  ￼
+	3.	Services & Fees  ￼
+	4.	Contact  ￼
+	5.	FAQs  ￼
+	6.	Resources index + 2 posts  ￼
+	7.	Privacy  ￼
+
+As you paste in content, make sure:
+	•	Headings match (H1/H2) so SEO doesn’t tank.
+	•	Buttons keep the same destinations (JaneApp, Substack, YouTube).  ￼
+
+7) Replace Squarespace-only functionality (30–45 min)
+
+Contact form: GitHub Pages can’t process forms.
+
+Pick one:
+	•	Formspree (simple, free tier) → static HTML form posts to Formspree, emails Emily
+	•	Google Form embed (free, less polished)
+	•	mailto: link (lowest friction, but worse UX, and can leak emails to scrapers)
+
+Important: the current site has a privacy policy and references a privacy@emilypotts.ca address—if you change form vendors, you may need to update the policy to reflect new data processing.  ￼
+
+8) Match styling (the “reverse engineering” part) (45–90 min)
+
+Goal: close-enough visual match without copying Squarespace template code.
+
+In a browser tomorrow:
+	•	Open the current site → DevTools:
+	•	Extract font families, font sizes, colors, max width, spacing, button styles.
+	•	Screenshot each major section on desktop + mobile.
+
+Then implement in CSS:
+	•	CSS variables: --bg, --text, --muted, --accent, --max-width, etc.
+	•	A simple responsive grid for:
+	•	hero section
+	•	2-column image/text blocks
+	•	the 3-tile services block
+	•	Mobile nav: either a simple stacked menu or minimal JS to toggle
+
+9) Deploy preview on GitHub Pages (15–20 min)
+
+Goal: a shareable link for Emily to review before DNS changes.
+	•	Create repo (either emilypotts or emilypotts.ca)
+	•	Settings → Pages → deploy from main branch /root
+	•	Verify:
+	•	all internal links work
+	•	resources post with weird slug works
+	•	images load
+	•	contact form submits to your chosen provider
+
+10) Domain cutover checklist (don’t do this until preview is approved)
+
+Goal: avoid downtime + avoid breaking email.
+	•	Add a CNAME file with emilypotts.ca
+	•	In DNS:
+	•	Point apex A records to GitHub Pages IPs
+	•	Point www CNAME to yourusername.github.io
+	•	Do not touch MX records if she uses domain email
+	•	After HTTPS is issued, confirm both www and apex redirect properly
+
+Gaps / blind spots to handle up front
+
+These are the places people get burned doing “Squarespace → free static”:
+	1.	“Free” isn’t fully free. Hosting is free, but:
+	•	domain renewal still costs money
+	•	forms may become paid if volume grows
+	•	analytics or privacy-compliant tooling may cost
+	2.	Editing workflow. If Emily isn’t technical, pushing updates via Git is friction.
+	•	Consider adding a lightweight CMS later (Decap CMS on GitHub is a common approach), or keep a “request changes” process.
+	3.	Legal/compliance. Therapy sites + contact forms + privacy policies matter.
+	•	Make sure the “not a crisis service” text stays prominent on Contact.  ￼
+	•	Ensure the privacy policy remains accessible and accurate after changing vendors.  ￼
+	4.	Design ownership. The footer credit suggests a designer/agency contributed.
+	•	Rebuild the look with your own code rather than copying Squarespace template assets.  ￼
+
+If you want, I can turn this into a “tomorrow morning checklist” you can literally paste into a GitHub issue (with subtasks + acceptance criteria for each page), but the steps above are already structured to run like a sprint.
