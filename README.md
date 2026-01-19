@@ -8,5 +8,8 @@ Upstream: https://github.com/austinbjohnson/emilyPottsCounseling
 ## Status
 Hosted on GitHub Pages and currently being migrated off Squarespace to reduce ongoing costs.
 
-## Status
-This repo is currently a skeleton; add site files and update this README with build/run instructions as they land.
+## Preview
+https://austinbjohnson.github.io/emilyPottsCounseling/
+
+## Development
+Static HTML/CSS/JS site. Serve locally with any static file server (for example: `python3 -m http.server`).
