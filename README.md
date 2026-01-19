@@ -11,5 +11,8 @@ Hosted on GitHub Pages and currently being migrated off Squarespace to reduce on
 ## Preview
 https://austinbjohnson.github.io/emilyPottsCounseling/
 
+## Production
+https://emilypotts.ca
+
 ## Development
 Static HTML/CSS/JS site. Serve locally with any static file server (for example: `python3 -m http.server`).
