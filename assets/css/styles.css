@@ -135,6 +135,15 @@ h4 {
   box-shadow: var(--shadow);
 }
 
+.hero-image {
+  width: 100%;
+  height: clamp(200px, 32vw, 320px);
+  border-radius: 16px;
+  margin-bottom: 1.2rem;
+  object-fit: cover;
+  object-position: center;
+}
+
 .hero-card h1 {
   font-size: clamp(2.2rem, 4vw, 3.5rem);
 }
@@ -171,6 +180,17 @@ h4 {
   background: #fff;
   box-shadow: 0 12px 35px rgba(63, 65, 60, 0.08);
 }
+
+.feature-image {
+  width: 100%;
+  height: clamp(240px, 45vw, 420px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 1.5rem 0;
+  object-fit: cover;
+  object-position: center;
+}
+
 
 .card h3 {
   font-size: 1.3rem;
@@ -302,6 +322,7 @@ details[open] {
   height: 200px;
   width: 100%;
   object-fit: cover;
+  object-position: center top;
 }
 
 .blog-card .content {
