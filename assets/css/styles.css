@@ -342,6 +342,27 @@ details[open] {
   gap: 1rem;
 }
 
+.form-stack label {
+  display: grid;
+  gap: 0.35rem;
+  font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.form-stack input,
+.form-stack textarea {
+  width: 100%;
+  background: #fff;
+}
+
+.form-stack .btn {
+  justify-content: center;
+  width: 100%;
+}
+
 input,
 textarea {
   font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
