@@ -313,10 +313,11 @@ h4 {
 
 .intro-portrait {
   position: absolute;
-  bottom: -40px;
-  left: 12%;
-  width: min(70%, 320px);
-  aspect-ratio: 1 / 1;
+  top: 0;
+  bottom: 0;
+  left: 10%;
+  width: min(70%, 420px);
+  height: 100%;
   border-radius: 999px 999px 22px 22px;
   object-fit: cover;
   border: 8px solid var(--bg);
