@@ -338,10 +338,10 @@ h4 {
 
 .olive-layout {
   display: grid;
-  column-gap: clamp(1.6rem, 4vw, 3.4rem);
-  row-gap: clamp(1.4rem, 3vw, 2.4rem);
-  grid-template-columns: minmax(160px, 0.28fr) minmax(0, 1fr);
-  grid-template-rows: auto minmax(240px, 1fr);
+  column-gap: clamp(2rem, 5vw, 4rem);
+  row-gap: clamp(1.6rem, 3.2vw, 2.6rem);
+  grid-template-columns: minmax(200px, 0.34fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(280px, 1fr);
   grid-template-areas:
     "left copy"
     "left right";
@@ -355,29 +355,30 @@ h4 {
   background-image: url("/emilyPottsCounseling/assets/img/home-olive-hiker.jpg");
   background-size: cover;
   background-position: center;
-  min-height: clamp(360px, 46vw, 520px);
+  min-height: clamp(440px, 50vw, 600px);
 }
 
 .olive-right-image {
   grid-area: right;
   background-image: url("/emilyPottsCounseling/assets/img/home-olive-branch.jpg");
   background-size: cover;
-  background-position: center;
-  min-height: clamp(220px, 24vw, 300px);
+  background-position: left center;
+  min-height: clamp(260px, 26vw, 340px);
 }
 
 .olive-copy {
   grid-area: copy;
-  max-width: 620px;
-  padding-top: clamp(0.4rem, 1.2vw, 1.2rem);
+  max-width: 650px;
+  padding-top: clamp(0.2rem, 1vw, 1rem);
 }
 
 .olive-panel {
   grid-area: right;
   align-self: start;
-  justify-self: center;
-  width: min(620px, 92%);
-  margin-top: clamp(-6rem, -7vw, -3.5rem);
+  justify-self: start;
+  width: min(640px, 96%);
+  margin-top: clamp(-3.5rem, -4.5vw, -1.8rem);
+  margin-left: clamp(1.4rem, 3vw, 2.6rem);
   position: relative;
   z-index: 2;
 }
@@ -879,15 +880,16 @@ footer a {
 
   .olive-panel {
     margin-top: 1.5rem;
-    width: min(520px, 100%);
+    margin-left: 0;
+    width: min(560px, 100%);
   }
 
   .olive-left-image {
-    min-height: 240px;
+    min-height: 260px;
   }
 
   .olive-right-image {
-    min-height: 220px;
+    min-height: 230px;
   }
 }
 
@@ -926,11 +928,11 @@ footer a {
   }
 
   .olive-left-image {
-    min-height: 220px;
+    min-height: 240px;
   }
 
   .olive-right-image {
-    min-height: 200px;
+    min-height: 210px;
   }
 
   .quote-overlay {
