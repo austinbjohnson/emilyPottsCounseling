@@ -338,56 +338,70 @@ h4 {
 
 .olive-layout {
   display: grid;
-  gap: clamp(2rem, 4vw, 3rem);
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
-  grid-template-rows: auto 1fr;
+  column-gap: clamp(1.6rem, 4vw, 3.4rem);
+  row-gap: clamp(1.4rem, 3vw, 2.4rem);
+  grid-template-columns: minmax(160px, 0.28fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(240px, 1fr);
   grid-template-areas:
-    "copy details"
-    "collage details";
-  align-items: start;
-  margin-top: 2.5rem;
+    "left copy"
+    "left right";
+  align-items: stretch;
+  position: relative;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.olive-left-image {
+  grid-area: left;
+  background-image: url("/emilyPottsCounseling/assets/img/home-olive-hiker.jpg");
+  background-size: cover;
+  background-position: center;
+  min-height: clamp(360px, 46vw, 520px);
+}
+
+.olive-right-image {
+  grid-area: right;
+  background-image: url("/emilyPottsCounseling/assets/img/home-olive-branch.jpg");
+  background-size: cover;
+  background-position: center;
+  min-height: clamp(220px, 24vw, 300px);
 }
 
 .olive-copy {
   grid-area: copy;
-  max-width: 680px;
+  max-width: 620px;
+  padding-top: clamp(0.4rem, 1.2vw, 1.2rem);
 }
 
-.olive-details {
-  grid-area: details;
-  margin-top: clamp(0.4rem, 1.2vw, 1.4rem);
+.olive-panel {
+  grid-area: right;
+  align-self: start;
+  justify-self: center;
+  width: min(620px, 92%);
+  margin-top: clamp(-6rem, -7vw, -3.5rem);
+  position: relative;
+  z-index: 2;
 }
 
-.olive-collage {
-  grid-area: collage;
-  margin-top: clamp(1.2rem, 3vw, 2.2rem);
-}
-
-.olive-images {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-soft);
-}
-
-.olive-images img {
-  width: 100%;
-  height: clamp(220px, 28vw, 300px);
-  object-fit: cover;
-}
-
-.details-panel {
-  background: #f5f1ec;
+.section.olive .details-panel {
+  background: var(--cream);
   color: var(--text);
-  padding: clamp(2rem, 3.4vw, 2.6rem);
-  border-radius: calc(var(--radius) + 4px);
+  padding: clamp(2.1rem, 3.4vw, 2.8rem);
+  border-radius: 12px;
   box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(63, 65, 60, 0.15);
+  border: 1px solid rgba(63, 65, 60, 0.18);
 }
 
-.details-panel .details-list {
+.section.olive .details-list {
   border-top: 1px solid var(--line);
+}
+
+.section.olive details {
+  border-color: rgba(63, 65, 60, 0.28);
+  padding: 1.3rem 0;
+}
+
+.section.olive details summary {
+  font-size: 1.05rem;
 }
 
 .how-grid {
@@ -857,19 +871,23 @@ footer a {
 
   .olive-layout {
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
     grid-template-areas:
       "copy"
-      "details"
-      "collage";
+      "right"
+      "left";
   }
 
-  .olive-details {
-    margin-top: 0;
-  }
-
-  .olive-collage {
+  .olive-panel {
     margin-top: 1.5rem;
+    width: min(520px, 100%);
+  }
+
+  .olive-left-image {
+    min-height: 240px;
+  }
+
+  .olive-right-image {
+    min-height: 220px;
   }
 }
 
@@ -907,12 +925,12 @@ footer a {
     margin: 1.5rem auto 0;
   }
 
-  .olive-images {
-    grid-template-columns: 1fr;
+  .olive-left-image {
+    min-height: 220px;
   }
 
-  .olive-images img {
-    height: 220px;
+  .olive-right-image {
+    min-height: 200px;
   }
 
   .quote-overlay {
