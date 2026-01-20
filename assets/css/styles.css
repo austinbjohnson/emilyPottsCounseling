@@ -339,64 +339,55 @@ h4 {
 .olive-layout {
   display: grid;
   gap: clamp(2rem, 4vw, 3rem);
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  grid-template-rows: auto 1fr;
   grid-template-areas:
-    "copy copy"
+    "copy details"
     "collage details";
   align-items: start;
-  margin-top: 2.25rem;
+  margin-top: 2.5rem;
 }
 
 .olive-copy {
   grid-area: copy;
-  max-width: 760px;
+  max-width: 680px;
 }
 
 .olive-details {
   grid-area: details;
-  align-self: start;
+  margin-top: clamp(0.4rem, 1.2vw, 1.4rem);
 }
 
 .olive-collage {
   grid-area: collage;
-  position: relative;
-  padding-right: clamp(0.5rem, 4vw, 2.5rem);
-  padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  margin-top: clamp(1.2rem, 3vw, 2.2rem);
 }
 
-.olive-collage-frame {
+.olive-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-soft);
 }
 
-.olive-photo {
-  display: block;
+.olive-images img {
   width: 100%;
+  height: clamp(220px, 28vw, 300px);
   object-fit: cover;
-}
-
-.olive-photo--primary {
-  height: clamp(220px, 30vw, 360px);
-}
-
-.olive-photo--secondary {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: min(62%, 320px);
-  border-radius: calc(var(--radius) - 6px);
-  border: 8px solid rgba(245, 241, 236, 0.95);
-  box-shadow: var(--shadow-soft);
 }
 
 .details-panel {
   background: #f5f1ec;
   color: var(--text);
-  padding: clamp(1.8rem, 3vw, 2.4rem) clamp(2rem, 3vw, 2.6rem);
-  border-radius: var(--radius);
+  padding: clamp(2rem, 3.4vw, 2.6rem);
+  border-radius: calc(var(--radius) + 4px);
   box-shadow: var(--shadow-soft);
   border: 1px solid rgba(63, 65, 60, 0.15);
+}
+
+.details-panel .details-list {
+  border-top: 1px solid var(--line);
 }
 
 .how-grid {
@@ -866,14 +857,19 @@ footer a {
 
   .olive-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
     grid-template-areas:
       "copy"
       "details"
       "collage";
   }
 
+  .olive-details {
+    margin-top: 0;
+  }
+
   .olive-collage {
-    padding-right: 0;
+    margin-top: 1.5rem;
   }
 }
 
@@ -911,19 +907,12 @@ footer a {
     margin: 1.5rem auto 0;
   }
 
-  .olive-collage {
-    padding-bottom: 0;
+  .olive-images {
+    grid-template-columns: 1fr;
   }
 
-  .olive-photo--primary {
-    height: 240px;
-  }
-
-  .olive-photo--secondary {
-    position: static;
-    width: 100%;
-    margin-top: 1rem;
-    border-width: 0;
+  .olive-images img {
+    height: 220px;
   }
 
   .quote-overlay {
