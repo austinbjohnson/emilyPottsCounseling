@@ -88,7 +88,7 @@ h4 {
 .site-header {
   padding: 1.4rem 0;
   position: sticky;
-  top: 6%;
+  top: 0;
   background: rgba(243, 240, 235, 0.96);
   backdrop-filter: blur(8px);
   z-index: 10;
