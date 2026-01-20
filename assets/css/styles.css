@@ -306,7 +306,7 @@ h4 {
 .intro-bg {
   width: 100%;
   height: 100%;
-  border-radius: var(--radius);
+  border-radius: clamp(120px, 28vw, 200px) clamp(120px, 28vw, 200px) var(--radius) var(--radius);
   object-fit: cover;
   box-shadow: var(--shadow-soft);
 }
