@@ -88,7 +88,7 @@ h4 {
 .site-header {
   padding: 1.4rem 0;
   position: sticky;
-  top: 0;
+  top: 6%;
   background: rgba(243, 240, 235, 0.96);
   backdrop-filter: blur(8px);
   z-index: 10;
@@ -313,10 +313,10 @@ h4 {
 
 .intro-portrait {
   position: absolute;
-  top: 0;
+  top: 6%;
   bottom: 0;
-  left: 10%;
-  width: min(70%, 420px);
+  left: 14%;
+  width: min(76%, 460px);
   height: 100%;
   border-radius: 999px 999px 22px 22px;
   object-fit: cover;
