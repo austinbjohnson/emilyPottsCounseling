@@ -330,6 +330,8 @@ h4 {
 .section.olive {
   background: var(--olive);
   color: #f5f1ec;
+  padding-bottom: 0;
+  overflow: hidden;
 }
 
 .section.olive .lede {
@@ -338,10 +340,10 @@ h4 {
 
 .olive-layout {
   display: grid;
-  column-gap: clamp(2rem, 5vw, 4rem);
-  row-gap: clamp(1.6rem, 3.2vw, 2.6rem);
-  grid-template-columns: minmax(200px, 0.34fr) minmax(0, 1fr);
-  grid-template-rows: auto minmax(280px, 1fr);
+  column-gap: clamp(2.4rem, 5vw, 4.4rem);
+  row-gap: clamp(1.6rem, 3vw, 2.6rem);
+  grid-template-columns: minmax(160px, 0.18fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(300px, 1fr);
   grid-template-areas:
     "left copy"
     "left right";
@@ -355,7 +357,9 @@ h4 {
   background-image: url("/emilyPottsCounseling/assets/img/home-olive-hiker.jpg");
   background-size: cover;
   background-position: center;
-  min-height: clamp(440px, 50vw, 600px);
+  min-height: clamp(460px, 54vw, 660px);
+  margin-left: calc(50% - 50vw);
+  width: calc(100% + (50vw - 50%));
 }
 
 .olive-right-image {
@@ -363,12 +367,17 @@ h4 {
   background-image: url("/emilyPottsCounseling/assets/img/home-olive-branch.jpg");
   background-size: cover;
   background-position: left center;
-  min-height: clamp(260px, 26vw, 340px);
+  min-height: clamp(280px, 30vw, 380px);
+  margin-right: calc(50% - 50vw);
+  width: calc(100% + (50vw - 50%));
+  justify-self: end;
+  align-self: end;
+  margin-bottom: calc(var(--content-gap) * -1);
 }
 
 .olive-copy {
   grid-area: copy;
-  max-width: 650px;
+  max-width: 640px;
   padding-top: clamp(0.2rem, 1vw, 1rem);
 }
 
@@ -376,9 +385,9 @@ h4 {
   grid-area: right;
   align-self: start;
   justify-self: start;
-  width: min(640px, 96%);
-  margin-top: clamp(-3.5rem, -4.5vw, -1.8rem);
-  margin-left: clamp(1.4rem, 3vw, 2.6rem);
+  width: min(640px, 92%);
+  margin-top: clamp(0.6rem, 1.4vw, 1.6rem);
+  margin-left: clamp(0.6rem, 1.6vw, 1.4rem);
   position: relative;
   z-index: 2;
 }
@@ -878,18 +887,25 @@ footer a {
       "left";
   }
 
-  .olive-panel {
-    margin-top: 1.5rem;
+  .olive-left-image,
+  .olive-right-image {
     margin-left: 0;
-    width: min(560px, 100%);
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .olive-panel {
+    margin-top: 1.6rem;
+    margin-left: 0;
+    width: min(520px, 100%);
   }
 
   .olive-left-image {
-    min-height: 260px;
+    min-height: 240px;
   }
 
   .olive-right-image {
-    min-height: 230px;
+    min-height: 220px;
   }
 }
 
@@ -928,11 +944,11 @@ footer a {
   }
 
   .olive-left-image {
-    min-height: 240px;
+    min-height: 230px;
   }
 
   .olive-right-image {
-    min-height: 210px;
+    min-height: 200px;
   }
 
   .quote-overlay {
