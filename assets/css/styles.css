@@ -11,6 +11,7 @@
   --max-width: 1100px;
   --content-gap: clamp(2rem, 4vw, 4.5rem);
   --radius: 18px;
+  --button-radius: 12px;
   --shadow: 0 18px 45px rgba(27, 28, 84, 0.12);
   --shadow-soft: 0 16px 40px rgba(63, 65, 60, 0.12);
 }
@@ -25,6 +26,32 @@ body {
   color: var(--text);
   background: var(--bg);
   line-height: 1.65;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--button-radius);
+  background: var(--dark);
+  color: #f7f6f4;
+  font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  transform: translateY(-220%);
+  transition: transform 180ms ease;
+  z-index: 20;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--dark);
+  outline-offset: 3px;
 }
 
 .sr-only {
@@ -138,6 +165,23 @@ h4 {
   color: var(--text);
 }
 
+.site-nav a[aria-current="page"] {
+  color: var(--dark);
+  position: relative;
+}
+
+.site-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.35rem;
+  height: 2px;
+  background: currentColor;
+  border-radius: 999px;
+  opacity: 0.9;
+}
+
 .site-nav-links {
   display: flex;
   align-items: center;
@@ -147,7 +191,7 @@ h4 {
 
 .nav-cta {
   padding: 0.7rem 1.5rem;
-  border-radius: 999px 999px 22px 22px;
+  border-radius: var(--button-radius);
   border: 1px solid rgba(115, 118, 160, 0.6);
   color: #6d6f8e;
   font-size: 0.8rem;
@@ -169,6 +213,7 @@ h4 {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   padding: 0.5rem 0.8rem;
+  border-radius: var(--button-radius);
 }
 
 .hero {
@@ -553,7 +598,7 @@ h4 {
   align-items: center;
   gap: 0.5rem;
   padding: 0.85rem 1.6rem;
-  border-radius: 999px 999px 22px 22px;
+  border-radius: var(--button-radius);
   font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -911,21 +956,56 @@ footer a {
 }
 
 @media (max-width: 860px) {
+  body.nav-open {
+    overflow: hidden;
+  }
+
+  body.nav-open::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(27, 28, 84, 0.35);
+    z-index: 8;
+  }
+
   .site-nav {
     display: none;
     flex-direction: column;
     align-items: flex-start;
-    width: 100%;
-    padding: 1rem 0;
-    border-top: 1px solid rgba(63, 65, 60, 0.15);
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    padding: 7rem 1.5rem 2.5rem;
+    background: rgba(243, 240, 235, 0.98);
+    backdrop-filter: blur(12px);
+    border-top: none;
+    overflow-y: auto;
+    z-index: 9;
   }
 
   .site-nav[data-open="true"] {
     display: flex;
   }
 
+  .site-nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 1.2rem;
+    margin: 0;
+  }
+
+  .site-nav a {
+    font-size: 1.1rem;
+  }
+
+  .nav-cta {
+    margin-top: 1.25rem;
+  }
+
   .nav-toggle {
     display: inline-flex;
+    z-index: 10;
   }
 
   .site-header .container {
