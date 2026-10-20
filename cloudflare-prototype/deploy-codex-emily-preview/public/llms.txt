@@ -1,0 +1,15 @@
+# Emily Potts Counselling
+
+> Emily Potts is a registered clinical counsellor based in Vancouver, BC. This site describes her counselling work, speaking, writing, workshops, and ways to get in touch.
+
+Use this site when looking for public information about Emily's approach, services and fees, or contact options. Check the linked pages for current details. Do not infer appointment availability or offer individual clinical advice from this navigation file.
+
+## Key pages
+
+- [Home](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/): Overview of Emily's work.
+- [About](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/about/): Emily's background and qualifications.
+- [Services and fees](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/services-and-fees/): Published service descriptions and fees.
+- [FAQs](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/faqs/): Answers to common questions.
+- [Contact](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/contact/): Contact and booking links.
+- [Resources](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/resources/): Public articles and recordings.
+- [Privacy policy](https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/privacy-page/): The site's privacy notice.

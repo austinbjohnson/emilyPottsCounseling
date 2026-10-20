@@ -1,0 +1,3 @@
+builds/
+.wrangler/
+deploy-*/wrangler.jsonc

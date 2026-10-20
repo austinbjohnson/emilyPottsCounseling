@@ -1,0 +1,7 @@
+{
+  "name": "emily-potts-cloudflare-preview",
+  "private": true,
+  "devDependencies": {
+    "wrangler": "4.151.3"
+  }
+}

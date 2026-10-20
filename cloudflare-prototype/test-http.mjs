@@ -1,0 +1,213 @@
+// Run against `wrangler dev --local` for a freshly staged build.
+import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
+import { request as httpRequest } from 'node:http';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const [base, buildDir, expectedOrigin = base] = process.argv.slice(2);
+if (!base || !buildDir) {
+  throw new Error('Usage: node test-http.mjs BASE_URL ABSOLUTE_BUILD_DIR [EXPECTED_PUBLIC_ORIGIN]');
+}
+let checks = 0;
+const generated = await import(pathToFileURL(join(buildDir, 'generated_content.mjs')).href);
+const isPages = existsSync(join(buildDir, 'public/_worker.js'));
+
+async function check(name, fn) {
+  await fn();
+  checks += 1;
+  console.log(`ok ${checks} - ${name}`);
+}
+
+async function get(path, accept, options = {}) {
+  const headers = { ...options.headers };
+  if (accept !== undefined) headers.Accept = accept;
+  const response = await fetch(base + path, { method: options.method || 'GET', headers, redirect: 'manual' });
+  return { response, body: await response.text() };
+}
+
+function contentType(response) {
+  return (response.headers.get('content-type') || '').split(';')[0].toLowerCase();
+}
+
+function vary(response) {
+  return (response.headers.get('vary') || '').split(',').map((item) => item.trim().toLowerCase());
+}
+
+async function getWithoutAccept() {
+  return new Promise((resolve, reject) => {
+    const request = httpRequest(base + '/', { headers: { 'User-Agent': 'local-probe' } }, (response) => {
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => resolve({ status: response.statusCode, headers: response.headers, body: Buffer.concat(chunks).toString() }));
+    });
+    request.on('error', reject);
+    request.end();
+  });
+}
+
+await check('staged public files and generated Markdown are complete', async () => {
+  const html = generated.HOME_HTML;
+  assert.equal(existsSync(join(buildDir, 'public/index.html')), isPages);
+  if (isPages) {
+    const fallback = readFileSync(join(buildDir, 'public/index.html'), 'utf8');
+    const pagesWorker = readFileSync(join(buildDir, 'public/_worker.js'), 'utf8');
+    const routes = JSON.parse(readFileSync(join(buildDir, 'public/_routes.json'), 'utf8'));
+    assert.equal(fallback, html);
+    assert.match(pagesWorker, /export default \{/);
+    assert.doesNotMatch(pagesWorker, /from '\.\/generated_content\.mjs'/);
+    assert.deepEqual(routes.include, ['/*']);
+    assert.ok(routes.exclude.includes('/assets/img/emily-hero-bw.jpg'));
+    assert.ok(routes.exclude.includes('/contact/'));
+    assert.ok(routes.exclude.includes('/llms.txt'));
+    assert.ok(!routes.exclude.includes('/'));
+    assert.ok(!routes.exclude.includes('/__missing__'));
+    assert.ok(routes.exclude.length + routes.include.length <= 100);
+  }
+  assert.ok(generated.HOME_MARKDOWN.length >= 500);
+  const contact = readFileSync(join(buildDir, 'public/contact/index.html'), 'utf8');
+  const sitemap = readFileSync(join(buildDir, 'public/sitemap.xml'), 'utf8');
+  const llms = readFileSync(join(buildDir, 'public/llms.txt'), 'utf8');
+  assert.match(html, new RegExp(`<meta property="og:url" content="${expectedOrigin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/">`));
+  assert.match(html, /"@type": "Person"/);
+  assert.match(contact, /This form opens your email app/);
+  assert.match(contact, /action="mailto:hello@emilypotts.ca"/);
+  assert.match(sitemap, new RegExp(expectedOrigin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(llms, /Use this site when/);
+  assert.doesNotMatch(html + contact + sitemap + llms, /austinbjohnson\.github\.io|\/emilyPottsCounseling\//);
+});
+
+await check('HTML and Markdown homepage variants have distinct bodies and ETags', async () => {
+  const html = await get('/', 'text/html');
+  const markdown = await get('/', 'text/markdown');
+  assert.equal(html.response.status, 200);
+  assert.equal(markdown.response.status, 200);
+  assert.equal(contentType(html.response), 'text/html');
+  assert.equal(contentType(markdown.response), 'text/markdown');
+  assert.match(html.body, /class="hero hero-split"/);
+  assert.match(markdown.body, /^# Let’s meet as you are, how you are\./);
+  assert.ok(markdown.body.length >= 500);
+  assert.doesNotMatch(markdown.body, /<!doctype html>/i);
+  assert.notEqual(html.response.headers.get('etag'), markdown.response.headers.get('etag'));
+  for (const item of [html, markdown]) {
+    assert.ok(vary(item.response).includes('accept'));
+    assert.ok(vary(item.response).includes('accept-encoding'));
+  }
+});
+
+await check('Accept quality, wildcards, specificity, case, and ties select correctly', async () => {
+  const absent = await getWithoutAccept();
+  assert.equal(absent.status, 200);
+  assert.match(absent.headers['content-type'], /^text\/html/);
+  assert.match(absent.body, /^<!doctype html>/i);
+  const cases = [
+    ['*/*', 'text/html'],
+    ['text/*', 'text/html'],
+    ['text/html, text/markdown', 'text/html'],
+    ['Text/Markdown; Q=1', 'text/markdown'],
+    ['text/markdown; charset=UTF-8', 'text/markdown'],
+    ['text/html;q=0.4, text/markdown;q=0.9', 'text/markdown'],
+    ['text/html;q=0.9, text/markdown;q=0.4', 'text/html'],
+    ['text/*;q=0.8,text/markdown;q=0', 'text/html'],
+    ['text/*;q=0.2,text/markdown;q=0.7', 'text/markdown'],
+    ['*/*;q=1,text/html;q=0', 'text/markdown'],
+    ['*/*;q=1,text/markdown;q=0', 'text/html'],
+    ['text/markdown;q=0,text/html;q=1', 'text/html'],
+  ];
+  for (const [accept, expected] of cases) {
+    const { response } = await get('/', accept);
+    assert.equal(response.status, 200, accept);
+    assert.equal(contentType(response), expected, accept);
+  }
+  for (const accept of ['application/json', 'text/html;q=0,text/markdown;q=0', '*/*;q=0']) {
+    const { response } = await get('/', accept);
+    assert.equal(response.status, 406, accept);
+    assert.ok(vary(response).includes('accept'));
+  }
+});
+
+await check('cache validators belong to each representation in either request order', async () => {
+  const html = await get('/', 'text/html');
+  const markdown = await get('/', 'text/markdown');
+  const htmlTag = html.response.headers.get('etag');
+  const markdownTag = markdown.response.headers.get('etag');
+  for (const [accept, own, other, expected] of [
+    ['text/html', htmlTag, markdownTag, 'text/html'],
+    ['text/markdown', markdownTag, htmlTag, 'text/markdown'],
+    ['text/markdown', markdownTag, htmlTag, 'text/markdown'],
+    ['text/html', htmlTag, markdownTag, 'text/html'],
+  ]) {
+    const repeat = await get('/', accept);
+    assert.equal(contentType(repeat.response), expected);
+    assert.equal(repeat.response.headers.get('etag'), own);
+    const conditional = await get('/', accept, { headers: { 'If-None-Match': own } });
+    assert.equal(conditional.response.status, 304);
+    assert.equal(conditional.body, '');
+    assert.equal(contentType(conditional.response), expected);
+    assert.ok(vary(conditional.response).includes('accept'));
+    const cross = await get('/', accept, { headers: { 'If-None-Match': other } });
+    assert.equal(cross.response.status, 200);
+    assert.equal(contentType(cross.response), expected);
+    const weak = await get('/', accept, { headers: { 'If-None-Match': `W/${own}` } });
+    assert.equal(weak.response.status, 304);
+  }
+});
+
+await check('HEAD keeps variant headers and suppresses bodies', async () => {
+  for (const accept of ['text/html', 'text/markdown']) {
+    const regular = await get('/', accept);
+    const head = await get('/', accept, { method: 'HEAD' });
+    assert.equal(head.response.status, 200);
+    assert.equal(head.body, '');
+    assert.equal(contentType(head.response), contentType(regular.response));
+    assert.equal(head.response.headers.get('etag'), regular.response.headers.get('etag'));
+    assert.ok(vary(head.response).includes('accept'));
+  }
+});
+
+await check('missing routes and assets remain 404 with recoverable Markdown', async () => {
+  for (const path of ['/__missing__', '/nested/__missing__/', '/assets/img/__missing__.jpg', '/favicon.ico', '/_worker.js', '/_routes.json']) {
+    for (const accept of ['text/html', 'text/markdown']) {
+      const { response, body } = await get(path, accept);
+      assert.equal(response.status, 404, `${path} ${accept}`);
+      assert.equal(contentType(response), accept, `${path} ${accept}`);
+      assert.ok(vary(response).includes('accept'));
+      if (accept === 'text/markdown') {
+        assert.match(body, /^# Page not found/);
+        assert.match(body, /sitemap\.xml/);
+        assert.ok(body.length >= 20);
+      } else {
+        assert.match(body, /We can&rsquo;t find that page/);
+      }
+    }
+  }
+  const miss = await get('/__missing__', 'text/markdown', { headers: { 'If-None-Match': '*' } });
+  assert.equal(miss.response.status, 404);
+  const head = await get('/__missing__', 'text/markdown', { method: 'HEAD' });
+  assert.equal(head.response.status, 404);
+  assert.equal(head.body, '');
+});
+
+await check('site pages, machine files, styles, script, and hero image serve correctly', async () => {
+  const expectations = [
+    ['/about/', 'text/html'], ['/services-and-fees/', 'text/html'],
+    ['/contact/', 'text/html'], ['/llms.txt', 'text/plain'],
+    ['/robots.txt', 'text/plain'], ['/sitemap.xml', 'application/xml'],
+    ['/assets/css/styles.css', 'text/css'],
+    ['/assets/js/main.js', ['text/javascript', 'application/javascript']],
+    ['/assets/img/emily-hero-bw.jpg', 'image/jpeg'],
+  ];
+  for (const [path, type] of expectations) {
+    const { response, body } = await get(path);
+    assert.equal(response.status, 200, path);
+    assert.ok((Array.isArray(type) ? type : [type]).includes(contentType(response)), path);
+    assert.ok(body.length > 0, path);
+  }
+  const contact = await get('/contact/');
+  assert.match(contact.body, /This form opens your email app/);
+  assert.match(contact.body, /action="mailto:hello@emilypotts.ca"/);
+  const post = await get('/contact/', undefined, { method: 'POST' });
+  assert.equal(post.response.status, 405);
+});
+
+console.log(`${checks} local Cloudflare ${isPages ? 'Pages' : 'Worker'} checks passed`);
