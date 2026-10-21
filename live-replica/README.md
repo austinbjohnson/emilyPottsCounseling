@@ -5,6 +5,9 @@ These 13 page files are static, sanitized snapshots of the public pages listed a
 transformation from temporary public HTML downloads. The original Squarespace
 application scripts, analytics, reCAPTCHA, embedded map and form delivery code are
 not included. Public responsive markup, authored text and layout styles remain.
+Inert Squarespace text-mark settings are retained; small local SVGs recreate the
+authored scribble on “exhaled.” and circle on “burnt out” with their measured
+colors, dimensions and draw durations. Reduced-motion visitors see completed marks.
 
 The Cloudflare build promotes these pages to the preview's normal routes while
 also retaining `/live-replica/` as a review path. Older repository pages and design

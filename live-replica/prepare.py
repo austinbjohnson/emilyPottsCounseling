@@ -1,11 +1,13 @@
 """Create a static, reviewable preview from public Squarespace page snapshots.
 
 Snapshots are supplied as inputs and are never committed. This deliberately removes
-the original site's scripts, form configuration, analytics, and submission paths.
+the original site's executable scripts, form configuration, analytics, and submission paths.
+Non-executable JSON describing public text marks is retained.
 The preview keeps the public page markup and layout rules for visual comparison.
 """
 
 import argparse
+import json
 from pathlib import Path
 import re
 
@@ -23,7 +25,21 @@ def transform(source: str, route: str) -> str:
     # The public HTML is rendered server side. Retain its CSS and body markup,
     # including mobile-specific sections, while removing remote application code.
     font_loader = re.search(r'<script\b[^>]*src="//use\.typekit\.net/ik/[^\"]+"[^>]*></script>', source, re.I | re.S)
-    source = re.sub(r"<script\b[^>]*>.*?</script\s*>", "", source, flags=re.I | re.S)
+    def keep_public_text_marks(match):
+        element = match.group(0)
+        opening = element[:element.find('>')]
+        if 'class="TextAttributes-props"' not in opening or 'type="application/json"' not in opening:
+            return ''
+        configs = json.loads(element[element.find('>') + 1:element.lower().rfind('</script')])
+        if not isinstance(configs, list) or not all(
+            isinstance(item, dict)
+            and re.fullmatch(r'[0-9a-f-]{36}', str(item.get('id', '')))
+            and item.get('shape') in ('circle', 'scribble', 'underline', 'underlineCurve')
+            for item in configs
+        ):
+            raise ValueError('Unexpected public text-mark configuration')
+        return element  # inert JSON, not a remotely executed application script
+    source = re.sub(r"<script\b[^>]*>.*?</script\s*>", keep_public_text_marks, source, flags=re.I | re.S)
     source = re.sub(r"<iframe\b[^>]*>.*?</iframe\s*>", "", source, flags=re.I | re.S)
     source = re.sub(r"<noscript\b[^>]*>.*?</noscript\s*>", "", source, flags=re.I | re.S)
     source = re.sub(r'<link\b[^>]*rel="canonical"[^>]*>', '', source, flags=re.I)
@@ -75,8 +91,8 @@ def transform(source: str, route: str) -> str:
     # content immediately for readable, no-JavaScript, reduced-motion output.
     source = source.replace("</head>",
         (font_loader.group(0) if font_loader else '') +
-        '<link rel="stylesheet" href="/live-replica/replica.css?v=7">'
-        '<script defer src="/live-replica/replica.js?v=7"></script>'
+        '<link rel="stylesheet" href="/live-replica/replica.css?v=8">'
+        '<script defer src="/live-replica/replica.js?v=8"></script>'
         '<meta name="robots" content="noindex,nofollow">'
         '</head>', 1)
     return source

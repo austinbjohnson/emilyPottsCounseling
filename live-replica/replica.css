@@ -40,6 +40,10 @@ html.replica-menu-open { overflow: hidden; }
 /* Squarespace removes the divider reserve at runtime; keep both hero heights. */
 section[data-section-id="680277a8ea31015ff40228ec"],
 section[data-section-id="680d4d66380d43436001db01"] { padding-bottom: 0 !important; }
+/* Lightweight, responsive SVG copies of the live site's authored text marks. */
+.replica-text-mark { position: absolute; z-index: -1; pointer-events: none; }
+.replica-text-mark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.replica-text-mark path { fill: none; stroke-linecap: square; stroke-linejoin: bevel; }
 @media (max-width: 800px) {
   html:not(.replica-js) .header-menu { display: block !important; position: relative !important; visibility: visible !important; opacity: 1 !important; height: auto !important; transform: none !important; }
   html:not(.replica-js) .header-menu-nav { position: relative !important; height: auto !important; }
