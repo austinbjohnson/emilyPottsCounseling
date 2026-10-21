@@ -2,12 +2,12 @@
   "name": "emilypottscounseling",
   "compatibility_date": "2026-08-06",
   "compatibility_flags": ["assets_navigation_has_no_effect"],
-  "main": "./cloudflare-prototype/deploy-codex-emily-preview-v5/worker.mjs",
+  "main": "./cloudflare-prototype/deploy-codex-emily-preview-v11/worker.mjs",
   "workers_dev": true,
   "preview_urls": true,
   "previews": {},
   "assets": {
-    "directory": "./cloudflare-prototype/deploy-codex-emily-preview-v5/public",
+    "directory": "./cloudflare-prototype/deploy-codex-emily-preview-v11/public",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"

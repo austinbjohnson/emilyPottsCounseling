@@ -7,6 +7,7 @@ overwritten or deleted. Supply the preview's actual origin before deployment.
 import argparse
 from dataclasses import dataclass, field
 import hashlib
+from html import escape
 from html.parser import HTMLParser
 import json
 from pathlib import Path
@@ -32,8 +33,22 @@ PAGES = (
     "design-variants/conversation-in-margins/index.html",
     "design-variants/room-to-unfold/index.html",
     "design-variants/near-across/index.html",
+    "live-replica/index.html", "live-replica/home/index.html",
+    "live-replica/about/index.html", "live-replica/services-and-fees/index.html",
+    "live-replica/speaking/index.html", "live-replica/therapy/index.html",
+    "live-replica/resources/index.html",
+    "live-replica/resources/what-to-know-before-your-first-therapy-session/index.html",
+    "live-replica/resources/exploring-solutions-for-climate-anxiety/index.html",
+    "live-replica/faqs/index.html", "live-replica/contact/index.html",
+    "live-replica/privacy-page/index.html", "live-replica/group-events-1/index.html",
 )
-OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js")
+OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js", "live-replica/replica.css", "live-replica/replica.js")
+LIVE_REPLICA_ROUTES = (
+    "", "home", "about", "services-and-fees", "speaking", "therapy",
+    "resources", "resources/what-to-know-before-your-first-therapy-session",
+    "resources/exploring-solutions-for-climate-anxiety", "faqs", "contact",
+    "privacy-page", "group-events-1",
+)
 CONTACT_NOTICE = (
     '          <p class="contact-delivery-note">This form opens your email app. '
     'Review and send the drafted email there; this website does not submit your message.</p>\n'
@@ -113,6 +128,11 @@ def home_markdown(html):
     def walk(node):
         if isinstance(node, str):
             return
+        # The live Squarespace homepage authors separate mobile and desktop
+        # hero sections. Markdown has no viewport, so emit the desktop copy
+        # once instead of repeating the heading and consultation CTA.
+        if node.attrs.get("data-section-id") == "680277a8ea31015ff40228ec":
+            return
         if re.fullmatch(r"h[1-6]", node.tag):
             blocks.append("#" * int(node.tag[1]) + " " + compact(inline(node)))
             return
@@ -183,6 +203,61 @@ def build(output, origin, local, platform="workers"):
             target = public / "assets/img" / source.name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
+
+    # Promote the public live replica to the preview's normal routes. Only the
+    # fresh generated output is written; the older source pages and all design
+    # variants remain intact for review. The /live-replica paths remain too.
+    for route in LIVE_REPLICA_ROUTES:
+        clone = (public / "live-replica" / route / "index.html").read_text(encoding="utf-8")
+        clone = clone.replace('href="/live-replica/', 'href="/')
+        clone = clone.replace('action="/live-replica/', 'action="/')
+        clone = clone.replace('href="/replica.css', 'href="/live-replica/replica.css')
+        clone = clone.replace('src="/replica.js"', 'src="/live-replica/replica.js"')
+        if route == "":
+            # Keep the earlier truthful identity fix when this public page is
+            # promoted. The official live URL identifies Emily; no address or
+            # private contact detail is inferred for structured data.
+            person = {
+                "@context": "https://schema.org",
+                "@type": "Person",
+                "@id": "https://emilypotts.ca/#emily-potts",
+                "name": "Emily Potts",
+                "description": "Anxiety, burnout, grief, trauma, and climate grief therapy in North Vancouver and online across BC. Book a free 20-minute consult with Emily Potts, RCC.",
+                "url": "https://emilypotts.ca/",
+                "jobTitle": "Registered Clinical Counsellor",
+            }
+            clone = clone.replace(
+                "</head>",
+                '<script type="application/ld+json">' + json.dumps(person, ensure_ascii=False) + '</script></head>',
+                1,
+            )
+            homepage_html = clone
+        else:
+            target = public / route / "index.html"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(clone, encoding="utf-8")
+
+    # List only the copied live pages, not the repository's older article slug
+    # or design review routes, in the preview's machine-readable sitemap.
+    locations = "\n".join(
+        f"  <url><loc>{escape(origin + '/' + (route + '/' if route else ''))}</loc></url>"
+        for route in LIVE_REPLICA_ROUTES
+    )
+    (public / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + locations + '\n</urlset>\n', encoding="utf-8"
+    )
+    llms = (public / "llms.txt").read_text(encoding="utf-8")
+    llms = llms.replace(
+        "- [Contact]({origin}/contact/): Contact and booking links.".format(origin=origin),
+        "- [Contact]({origin}/contact/): The preview links to Emily’s live contact form; the preview does not collect inquiries.".format(origin=origin),
+    )
+    llms += (
+        f"\n- [First therapy session article]({origin}/resources/what-to-know-before-your-first-therapy-session/): "
+        "Public article from Emily’s live website.\n"
+    )
+    (public / "llms.txt").write_text(llms, encoding="utf-8")
 
     html = homepage_html
     not_found_html = (public / "404.html").read_text(encoding="utf-8")

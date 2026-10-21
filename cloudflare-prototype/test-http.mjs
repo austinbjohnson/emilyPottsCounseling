@@ -68,12 +68,20 @@ await check('staged public files and generated Markdown are complete', async () 
   const contact = readFileSync(join(buildDir, 'public/contact/index.html'), 'utf8');
   const sitemap = readFileSync(join(buildDir, 'public/sitemap.xml'), 'utf8');
   const llms = readFileSync(join(buildDir, 'public/llms.txt'), 'utf8');
-  assert.match(html, new RegExp(`<meta property="og:url" content="${expectedOrigin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/">`));
+  assert.match(html, /<h1[^>]*>A place to <em>land<\/em><\/h1>/);
+  assert.match(html, /name="robots" content="noindex,nofollow"/);
   assert.match(html, /"@type": "Person"/);
-  assert.match(contact, /This form opens your email app/);
-  assert.match(contact, /action="mailto:hello@emilypotts.ca"/);
+  assert.match(html, /"url": "https:\/\/emilypotts\.ca\/"/);
+  assert.doesNotMatch(html, /"address":|"telephone":/);
+  assert.match(contact, /This preview does not receive messages/);
+  assert.match(contact, /https:\/\/emilypotts\.ca\/contact/);
+  assert.doesNotMatch(contact, /action="mailto:|<form\b/i);
   assert.match(sitemap, new RegExp(expectedOrigin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(llms, /Use this site when/);
+  assert.match(llms, /preview does not collect inquiries/);
+  assert.equal((sitemap.match(/<loc>/g) || []).length, 13);
+  assert.match(sitemap, /what-to-know-before-your-first-therapy-session/);
+  assert.doesNotMatch(sitemap, /Blog%20Post%20Title%20One/);
   assert.doesNotMatch(html + contact + sitemap + llms, /austinbjohnson\.github\.io|\/emilyPottsCounseling\//);
 });
 
@@ -84,8 +92,9 @@ await check('HTML and Markdown homepage variants have distinct bodies and ETags'
   assert.equal(markdown.response.status, 200);
   assert.equal(contentType(html.response), 'text/html');
   assert.equal(contentType(markdown.response), 'text/markdown');
-  assert.match(html.body, /class="hero hero-split"/);
-  assert.match(markdown.body, /^# Let’s meet as you are, how you are\./);
+  assert.match(html.body, /A place to <em>land<\/em>/);
+  assert.match(markdown.body, /^# A place to land/);
+  assert.equal((markdown.body.match(/^# A place to land$/gm) || []).length, 1);
   assert.ok(markdown.body.length >= 500);
   assert.doesNotMatch(markdown.body, /<!doctype html>/i);
   assert.notEqual(html.response.headers.get('etag'), markdown.response.headers.get('etag'));
@@ -204,38 +213,57 @@ await check('site pages, machine files, styles, script, and hero image serve cor
     assert.ok(body.length > 0, path);
   }
   const contact = await get('/contact/');
-  assert.match(contact.body, /This form opens your email app/);
-  assert.match(contact.body, /action="mailto:hello@emilypotts.ca"/);
+  assert.match(contact.body, /This preview does not receive messages/);
+  assert.match(contact.body, /the live contact form/);
   const post = await get('/contact/', undefined, { method: 'POST' });
   assert.equal(post.response.status, 405);
 });
 
-await check('booking, consultation duration, and practical policies match current published site', async () => {
-  const paths = ['/', '/about/', '/services-and-fees/', '/contact/', '/faqs/',
-    '/speaking/', '/therapy/', '/resources/', '/privacy-page/',
-    '/resources/Blog Post Title One-y2epy-y63ns/',
+await check('live public routes and safe external links are preserved', async () => {
+  const paths = ['/', '/home/', '/about/', '/services-and-fees/', '/contact/', '/faqs/',
+    '/speaking/', '/therapy/', '/resources/', '/privacy-page/', '/group-events-1/',
+    '/resources/what-to-know-before-your-first-therapy-session/',
     '/resources/exploring-solutions-for-climate-anxiety/'];
   for (const path of paths) {
     const { response, body } = await get(path, 'text/html');
     assert.equal(response.status, 200, path);
-    assert.match(body, /href="https:\/\/emilypotts\.janeapp\.com\/"[^>]*>Book Now<\/a>/, path);
+    assert.match(body, /https:\/\/emilypotts\.janeapp\.com\//, path);
+    assert.match(body, /href="\/about"/, path);
+    assert.match(body, /name="robots" content="noindex,nofollow"/, path);
+    assert.doesNotMatch(body, /<form\b|<iframe\b|href="\/(?:live-replica\/)?cart"/i, path);
+    assert.equal((body.match(/<script\b/gi) || []).length, path === '/' ? 3 : 2, path);
     assert.doesNotMatch(body, /peakresilience\.janeapp\.com|free 15-minute|out of Peak Resilience/i, path);
-    assert.match(body, /In-person sessions are available in North Vancouver, BC\./, path);
   }
   const home = await get('/', 'text/html');
   const markdown = await get('/', 'text/markdown');
+  assert.match(home.body, /Therapy as you are/);
   assert.match(home.body, /https:\/\/emilypotts\.janeapp\.com\/#\/discipline\/1\/treatment\/1/);
   assert.match(markdown.body, /https:\/\/emilypotts\.janeapp\.com\/#\/discipline\/1\/treatment\/1/);
-  assert.doesNotMatch(markdown.body, /peakresilience\.janeapp\.com|15-minute/);
   const about = await get('/about/');
   const services = await get('/services-and-fees/');
   assert.match(about.body, /emilypotts\.janeapp\.com\/#\/staff_member\/1\/treatment\/1/);
   assert.match(services.body, /emilypotts\.janeapp\.com\/#\/staff_member\/1\/treatment\/1/);
-  assert.match(services.body, /Couples &amp; Relationships/);
-  assert.doesNotMatch(services.body, /ICBC/);
+  assert.match(services.body, /\$174/);
+  assert.match(services.body, /\$227/);
   const faq = await get('/faqs/');
-  assert.match(faq.body, /24 hours&rsquo; notice/);
-  assert.doesNotMatch(faq.body, /48 hours|100-minute|ICBC/);
+  assert.match(faq.body, /Can you prescribe time in nature/);
+  assert.equal((faq.body.match(/class="accordion-item"/g) || []).length, 11);
+  const firstArticle = await get('/resources/what-to-know-before-your-first-therapy-session/');
+  assert.match(firstArticle.body, /href="https:\/\/emilypotts\.janeapp\.com\/"/);
+  const resources = await get('/resources/');
+  assert.match(resources.body, /href="\/resources\/what-to-know-before-your-first-therapy-session"/);
+  const replicaJs = await get('/live-replica/replica.js');
+  const replicaCss = await get('/live-replica/replica.css');
+  assert.match(replicaJs.body, /element\.inert = open/);
+  assert.match(replicaJs.body, /event\.key === 'Tab'/);
+  assert.match(replicaJs.body, /new ResizeObserver\(sizeMenu\)/);
+  assert.match(replicaCss.body, /html:not\(\.replica-js\) \.header-menu/);
+  assert.match(replicaCss.body, /\.replica-js \.accordion-item__dropdown/);
+  const mirror = await get('/live-replica/');
+  assert.equal(mirror.response.status, 200);
+  assert.match(mirror.body, /href="\/live-replica\/about"/);
+  const missing = await get('/resources/Blog%20Post%20Title%20One-y2epy-y63ns/');
+  assert.equal(missing.response.status, 200); // Preserved old source route for comparison.
 });
 
 await check('three review concepts have usable public pages and safe booking links', async () => {

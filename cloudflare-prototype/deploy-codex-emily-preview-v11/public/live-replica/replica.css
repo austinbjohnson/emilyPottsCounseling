@@ -1,0 +1,50 @@
+/* Small behavioral bridge for the isolated, script-free Squarespace snapshot. */
+.replica-inquiry-note {
+  position: relative;
+  z-index: 2;
+  padding: 1rem 4vw;
+  background: #f0efee;
+  color: #3f413c;
+  font: 1rem/1.5 sans-serif;
+  text-align: center;
+}
+.replica-inquiry-note a { color: #315770; text-decoration: underline; }
+.replica-form-placeholder {
+  padding: 1.5rem;
+  background: #f0efee;
+  color: #3f413c;
+  font: 1rem/1.5 sans-serif;
+}
+.replica-form-placeholder a { color: #315770; text-decoration: underline; }
+#block-4b7f33f0ca6c6fc851fb .form-wrapper { display: block !important; }
+.replica-inquiry-dialog {
+  width: min(90vw, 540px);
+  border: 1px solid #3f413c;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: #f0efee;
+  color: #3f413c;
+  font: 1.125rem/1.5 Georgia, serif;
+}
+.replica-inquiry-dialog::backdrop { background: #2228; }
+.replica-inquiry-dialog a { color: #315770; text-decoration: underline; }
+.replica-inquiry-dialog button { float: right; cursor: pointer; }
+.replica-image-dialog { width: min(96vw, 1500px); max-height: 96vh; border: 0; padding: 0; background: transparent; color: white; }
+.replica-image-dialog::backdrop { background: #111e; }
+.replica-image-dialog img { display: block; max-width: 96vw; max-height: 90vh; object-fit: contain; }
+.replica-image-dialog button { display: block; margin: 0 0 .5rem auto; background: #f0efee; color: #3f413c; border: 0; padding: .4rem .8rem; cursor: pointer; }
+html.replica-js:not(.replica-menu-open) .header-menu { visibility: hidden !important; pointer-events: none !important; }
+html.replica-menu-open .header-menu { visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
+html.replica-menu-open { overflow: hidden; }
+.replica-js .accordion-item__dropdown { display: none; }
+.accordion-item:has(.accordion-item__click-target[aria-expanded="true"]) .accordion-item__dropdown { display: block; }
+/* Squarespace removes the divider reserve at runtime; keep both hero heights. */
+section[data-section-id="680277a8ea31015ff40228ec"],
+section[data-section-id="680d4d66380d43436001db01"] { padding-bottom: 0 !important; }
+@media (max-width: 800px) {
+  html:not(.replica-js) .header-menu { display: block !important; position: relative !important; visibility: visible !important; opacity: 1 !important; height: auto !important; transform: none !important; }
+  html:not(.replica-js) .header-menu-nav { position: relative !important; height: auto !important; }
+}
+[data-animation-role], .preFade, .sqs-block, .fe-block { opacity: 1 !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
