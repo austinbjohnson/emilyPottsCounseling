@@ -280,4 +280,25 @@ await check('three scroll explorations retain complete content and calm static p
   }
 });
 
+await check('reference-led geography concept keeps booking and service meaning direct', async () => {
+  const path = '/design-variants/near-across/';
+  const { response, body } = await get(path, 'text/html');
+  assert.equal(response.status, 200);
+  assert.equal(contentType(response), 'text/html');
+  assert.match(body, /name="robots" content="noindex,nofollow"/);
+  assert.match(body, /<h1[^>]*>Near\.<span>Across\.<\/span><\/h1>/);
+  assert.match(body, /British Columbia and North Vancouver/);
+  assert.match(body, /North Vancouver[^<]*<\/text>/);
+  assert.match(body, /Online[^<]*<\/strong>/);
+  assert.match(body, /Across British Columbia/);
+  assert.match(body, /https:\/\/emilypotts\.janeapp\.com\/#\/staff_member\/1\/treatment\/1/);
+  for (const href of ['/about/', '/services-and-fees/', '/faqs/', '/contact/', '/privacy-page/']) {
+    assert.ok(body.includes(`href="${href}"`), href);
+  }
+  assert.doesNotMatch(body, /<script|scroll-snap|scrollTo\(|scrollIntoView\(|peakresilience|free 15-minute/i);
+  assert.match(body, /prefers-reduced-motion:reduce/);
+  const missing = await get('/design-variants/near-across/not-a-page', 'text/html');
+  assert.equal(missing.response.status, 404);
+});
+
 console.log(`${checks} local Cloudflare ${isPages ? 'Pages' : 'Worker'} checks passed`);

@@ -31,6 +31,7 @@ PAGES = (
     "design-variants/field-notes/index.html",
     "design-variants/conversation-in-margins/index.html",
     "design-variants/room-to-unfold/index.html",
+    "design-variants/near-across/index.html",
 )
 OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js")
 CONTACT_NOTICE = (
