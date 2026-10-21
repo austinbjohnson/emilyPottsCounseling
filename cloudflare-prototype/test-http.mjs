@@ -235,6 +235,8 @@ await check('live public routes and safe external links are preserved', async ()
     assert.equal(response.status, 200, path);
     assert.match(body, /https:\/\/emilypotts\.janeapp\.com\//, path);
     assert.match(body, /href="\/about"/, path);
+    assert.match(body, /\/live-replica\/replica\.css\?v=9/, path);
+    assert.match(body, /\/live-replica\/replica\.js\?v=9/, path);
     assert.match(body, /name="robots" content="noindex,nofollow"/, path);
     assert.doesNotMatch(body, /<form\b|<iframe\b|href="\/(?:live-replica\/)?cart"/i, path);
     const scripts = [...body.matchAll(/<script\b[^>]*>/gi)].map(match => match[0]);
@@ -275,8 +277,13 @@ await check('live public routes and safe external links are preserved', async ()
   assert.match(replicaJs.body, /scribble: \{ box: '0 0 66 27'/);
   assert.match(replicaJs.body, /circle: \{ box: '0 0 75 27'/);
   assert.match(replicaJs.body, /IntersectionObserver/);
+  assert.match(replicaJs.body, /image\?\.dataset\.image \|\| image\?\.dataset\.src/);
+  assert.match(replicaJs.body, /dialog\.addEventListener\('cancel'/);
+  assert.match(replicaJs.body, /replica-entrance-pending/);
   assert.match(replicaCss.body, /html:not\(\.replica-js\) \.header-menu/);
   assert.match(replicaCss.body, /\.replica-js \.accordion-item__dropdown/);
+  assert.match(replicaCss.body, /\.replica-image-dialog--open \{ opacity: 1; \}/);
+  assert.match(replicaCss.body, /\.replica-entrance-pending \{ opacity: 0 !important; \}/);
   const mirror = await get('/live-replica/');
   assert.equal(mirror.response.status, 200);
   assert.match(mirror.body, /href="\/live-replica\/about"/);

@@ -91,8 +91,8 @@ def transform(source: str, route: str) -> str:
     # content immediately for readable, no-JavaScript, reduced-motion output.
     source = source.replace("</head>",
         (font_loader.group(0) if font_loader else '') +
-        '<link rel="stylesheet" href="/live-replica/replica.css?v=8">'
-        '<script defer src="/live-replica/replica.js?v=8"></script>'
+        '<link rel="stylesheet" href="/live-replica/replica.css?v=9">'
+        '<script defer src="/live-replica/replica.js?v=9"></script>'
         '<meta name="robots" content="noindex,nofollow">'
         '</head>', 1)
     return source

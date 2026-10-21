@@ -85,21 +85,52 @@
   document.querySelectorAll('[data-sqsp-image-block-lightbox-button]').forEach(button => {
     button.addEventListener('click', () => {
       const image = button.closest('.fluid-image-container')?.querySelector('img');
-      const source = image?.currentSrc || image?.src || image?.dataset.src;
+      // The original lightbox clones the authored image, not its small inline
+      // rendering. Its data-image URL is the full-size public Squarespace asset.
+      const source = image?.dataset.image || image?.dataset.src || image?.currentSrc || image?.src;
       if (!source) return;
       const dialog = document.createElement('dialog');
       dialog.className = 'replica-image-dialog';
+      dialog.setAttribute('aria-label', 'Full size image');
       const close = document.createElement('button');
       close.type = 'button';
-      close.textContent = 'Close';
-      close.addEventListener('click', () => dialog.close());
+      close.className = 'replica-image-dialog__close';
+      close.setAttribute('aria-label', 'Close image');
+      close.textContent = '×';
       const large = document.createElement('img');
       large.src = source;
       large.alt = image.alt || '';
+      const dimensions = image.dataset.imageDimensions?.match(/^(\d+)x(\d+)$/);
+      if (dimensions) {
+        large.width = Number(dimensions[1]);
+        large.height = Number(dimensions[2]);
+      }
       dialog.append(close, large);
-      dialog.addEventListener('close', () => dialog.remove());
+      let closing = false;
+      const dismiss = () => {
+        if (closing) return;
+        closing = true;
+        dialog.classList.remove('replica-image-dialog--open');
+        if (reducedMotion.matches) dialog.close();
+        else window.setTimeout(() => dialog.close(), 600);
+      };
+      close.addEventListener('click', dismiss);
+      dialog.addEventListener('click', event => {
+        if (event.target === dialog) dismiss();
+      });
+      dialog.addEventListener('cancel', event => {
+        event.preventDefault();
+        dismiss();
+      });
+      dialog.addEventListener('close', () => {
+        dialog.remove();
+        button.focus();
+      });
       document.body.append(dialog);
       dialog.showModal();
+      close.focus();
+      if (reducedMotion.matches) dialog.classList.add('replica-image-dialog--open');
+      else requestAnimationFrame(() => dialog.classList.add('replica-image-dialog--open'));
     });
   });
 
@@ -114,6 +145,37 @@
     underlineCurve: { box: '0 0 75 27', d: 'M0 26.7 C18.75 24.5 37.5 23.8 56.25 24 C68 24.1 73.5 24.8 75 24.84' },
   };
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // The saved Squarespace settings specify fade / ease / 1.50s. Its animation
+  // module skips items already in view, then reveals later items on entry.
+  // Keep all content visible if JS, IntersectionObserver, or motion is absent.
+  if ('IntersectionObserver' in window && !reducedMotion.matches) {
+    const selector = 'h1, h2, h3, h4, h5, p, [data-animation-role="image"], [data-animation-role="button"], [data-animation-role="header-element"]';
+    const candidates = [...document.querySelectorAll(selector)].filter(element => {
+      const rect = element.getBoundingClientRect();
+      return rect.width && rect.height && (rect.top >= window.innerHeight || rect.bottom <= 0);
+    });
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.remove('replica-entrance-pending');
+        entry.target.classList.add('replica-entrance-visible');
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.05 });
+    candidates.forEach((element, index) => {
+      element.style.setProperty('--replica-entrance-delay', `${index * 0.6 / candidates.length}s`);
+      element.classList.add('replica-entrance-pending');
+      observer.observe(element);
+    });
+    reducedMotion.addEventListener?.('change', event => {
+      if (!event.matches) return;
+      observer.disconnect();
+      candidates.forEach(element => {
+        element.classList.remove('replica-entrance-pending');
+        element.classList.add('replica-entrance-visible');
+      });
+    });
+  }
   document.querySelectorAll('script.TextAttributes-props[type="application/json"]').forEach(script => {
     const block = script.closest('.sqs-block-content');
     if (!block) return;

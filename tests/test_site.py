@@ -212,7 +212,10 @@ class SiteTests(unittest.TestCase):
             self.assertNotIn("All in-person services are provided out of Peak Resilience", html, str(page))
             if "Book Now" in html:
                 self.assertIn(f'href="{current_booking}"', html, str(page))
-                self.assertIn("In-person sessions are available in North Vancouver, BC.", html, str(page))
+                # This notice was added to older repository pages. The live
+                # replica retains Emily's authored public wording verbatim.
+                if "live-replica" not in page.parts:
+                    self.assertIn("In-person sessions are available in North Vancouver, BC.", html, str(page))
 
         home = (ROOT / "index.html").read_text(encoding="utf-8")
         self.assertIn('href="https://emilypotts.janeapp.com/#/discipline/1/treatment/1"', home)
