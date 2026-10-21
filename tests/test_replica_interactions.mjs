@@ -87,6 +87,8 @@ assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.replica-ima
 assert.match(css, /\.replica-image-dialog--open::backdrop \{ background: rgba\(0, 0, 0, \.95\); \}/);
 assert.match(css, /max-width: calc\(100vw - 48px\)/);
 assert.match(css, /@media \(max-width: 800px\)[\s\S]*max-width: calc\(100vw - 16px\)/);
+assert.match(css, /section\[data-section-id="6a3ac973a9eb766792ae64a5"\] \.fe-block-e12a6151031f244054f2 \{\s*text-align: right/);
+assert.match(css, /@media \(min-width: 768px\)[\s\S]*\.fe-block-e12a6151031f244054f2 \{\s*grid-column: 2 \/ -2/);
 
 const normal = setup();
 assert.equal(normal.visible.classList.contains('replica-entrance-pending'), false, 'above-fold text stays visible');
