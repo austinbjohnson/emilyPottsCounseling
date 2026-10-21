@@ -28,6 +28,9 @@ PAGES = (
     "design-variants/open-shore/index.html",
     "design-variants/in-good-company/index.html",
     "design-variants/clear-practice/index.html",
+    "design-variants/field-notes/index.html",
+    "design-variants/conversation-in-margins/index.html",
+    "design-variants/room-to-unfold/index.html",
 )
 OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js")
 CONTACT_NOTICE = (

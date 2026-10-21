@@ -245,12 +245,38 @@ await check('three review concepts have usable public pages and safe booking lin
     assert.equal(response.status, 200, path);
     assert.equal(contentType(response), 'text/html', path);
     assert.match(body, /<h1[ >]/i, path);
-    assert.match(body, /name="robots" content="noindex, nofollow"/, path);
+    assert.match(body, /name="robots" content="noindex,?\s*nofollow"/, path);
     assert.match(body, /href="https:\/\/emilypotts\.janeapp\.com\//, path);
     assert.match(body, /href="\/privacy-page\/"/, path);
     assert.match(body, /BC Crisis Centre/, path);
     assert.doesNotMatch(body, /peakresilience|15-minute|48 hours|100-minute|ICBC/i, path);
     assert.match(body, /@media/i, path);
+  }
+});
+
+await check('three scroll explorations retain complete content and calm static paths', async () => {
+  const variants = [
+    ['field-notes', /Two paths, side by side/, /class="stops"/, /Reduce motion/],
+    ['conversation-in-margins', /You might be thinking/, /class="dialogue"/, /Reduce motion/],
+    ['room-to-unfold', /folded field map/, /data-scroll-motion="off"/, /Enable paper movement/],
+  ];
+  for (const [name, thesis, structure, control] of variants) {
+    const path = `/design-variants/${name}/`;
+    const { response, body } = await get(path, 'text/html');
+    assert.equal(response.status, 200, path);
+    assert.equal(contentType(response), 'text/html', path);
+    assert.match(body, /<h1[ >]/i, path);
+    assert.match(body, /name="robots" content="noindex,?\s*nofollow"/, path);
+    assert.match(body, thesis, path);
+    assert.match(body, structure, path);
+    assert.match(body, control, path);
+    assert.match(body, /prefers-reduced-motion:\s*reduce/, path);
+    assert.match(body, /href="https:\/\/emilypotts\.janeapp\.com\/#\/(?:discipline|staff_member)\/1\/treatment\/1"/, path);
+    assert.match(body, /href="\/services-and-fees\/"/, path);
+    assert.match(body, /href="\/privacy-page\/"/, path);
+    assert.match(body, /BC Crisis Centre/, path);
+    assert.doesNotMatch(body, /peakresilience|free 15-minute|48 hours|100-minute|ICBC/i, path);
+    assert.doesNotMatch(body, /scroll-snap|scrollTo\(|scrollIntoView\(|overflow:\s*hidden\s*;\s*height:\s*100vh/i, path);
   }
 });
 
