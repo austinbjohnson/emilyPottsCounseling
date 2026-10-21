@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://codex-emily-preview-emilypottscounseling.austinbjohnson.workers.dev/sitemap.xml

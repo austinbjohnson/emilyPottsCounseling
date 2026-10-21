@@ -307,6 +307,41 @@ await check('three review concepts have usable public pages and safe booking lin
   }
 });
 
+await check('Emily review hub and three new directions serve as separate safe paths', async () => {
+  const hub = await get('/em-review/');
+  assert.equal(hub.response.status, 200);
+  assert.equal(contentType(hub.response), 'text/html');
+  assert.match(hub.body, /name="robots" content="noindex,nofollow"/);
+  for (const path of ['/em-review/1/', '/em-review/2/', '/em-review/3/']) {
+    assert.ok(hub.body.includes(`href="${path}"`), path);
+    const { response, body } = await get(path, 'text/html');
+    assert.equal(response.status, 200, path);
+    assert.equal(contentType(response), 'text/html', path);
+    assert.match(body, /<h1\b/i, path);
+    assert.match(body, /name="robots" content="noindex,?\s*nofollow"/, path);
+    assert.match(body, /https:\/\/emilypotts\.janeapp\.com\//, path);
+    assert.match(body, /prefers-reduced-motion:\s*reduce/, path);
+    assert.doesNotMatch(body, /peakresilience|<form\b|<iframe\b|moodboard|eru\.potts@gmail\.com/i, path);
+    const head = await get(path, undefined, { method: 'HEAD' });
+    assert.equal(head.response.status, 200, path);
+    assert.equal(head.body, '', path);
+    const missing = await get(`${path}missing`, 'text/html');
+    assert.equal(missing.response.status, 404, path);
+  }
+  const one = await get('/em-review/1/');
+  const two = await get('/em-review/2/');
+  const three = await get('/em-review/3/');
+  assert.match(one.body, /aria-label="On this page"/);
+  assert.match(two.body, /<details class="story">/);
+  assert.match(three.body, /<table>/);
+  assert.match(three.body, /<td>\$174<\/td>/);
+  assert.match(three.body, /<td>\$339<\/td>/);
+  for (const image of ['emily-lakeshore.jpg', 'about-intro-portrait.jpg', 'emily-portrait-1.jpg']) {
+    const { response } = await get(`/assets/img/${image}`);
+    assert.equal(response.status, 200, image);
+  }
+});
+
 await check('three scroll explorations retain complete content and calm static paths', async () => {
   const variants = [
     ['field-notes', /Two paths, side by side/, /class="stops"/, /Reduce motion/],

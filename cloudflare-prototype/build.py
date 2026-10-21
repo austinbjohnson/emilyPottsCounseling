@@ -48,6 +48,12 @@ PAGES = (
     "live-replica/privacy-page/index.html", "live-replica/group-events-1/index.html",
 )
 OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js", "assets/fonts/OFL-Caveat.txt", "live-replica/replica.css", "live-replica/replica.js")
+REVIEW_PAGES = (
+    ("design-variants/em-review-hub/index.html", "em-review/index.html"),
+    ("design-variants/em-review-1/index.html", "em-review/1/index.html"),
+    ("design-variants/em-review-2/index.html", "em-review/2/index.html"),
+    ("design-variants/em-review-3/index.html", "em-review/3/index.html"),
+)
 LIVE_REPLICA_ROUTES = (
     "", "home", "about", "services-and-fees", "speaking", "therapy",
     "resources", "resources/what-to-know-before-your-first-therapy-session",
@@ -209,6 +215,13 @@ def build(output, origin, local, platform="workers"):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
 
+    # Stage additive review paths for this preview artifact. Production release
+    # builds must omit these paths while retaining their source for comparison.
+    for source_name, public_name in REVIEW_PAGES:
+        target = public / public_name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text((SOURCE / source_name).read_text(encoding="utf-8"), encoding="utf-8")
+
     font = SOURCE / "assets/fonts/Caveat-variable.ttf"
     target = public / "assets/fonts" / font.name
     shutil.copyfile(font, target)
@@ -326,7 +339,7 @@ def build(output, origin, local, platform="workers"):
         (public / "_routes.json").write_text(json.dumps(routes, indent=2) + "\n", encoding="utf-8")
         # The Pages Direct Upload command needs only the public directory.
         # It creates a separate Pages project and never uses Worker config.
-        return len(PAGES) + len(OTHER_TEXT) + len(list((public / "assets/img").iterdir())) + 1
+        return len(PAGES) + len(OTHER_TEXT) + len(REVIEW_PAGES) + len(list((public / "assets/img").iterdir())) + 1
     if platform != "workers":
         raise ValueError("Platform must be 'workers' or 'pages'")
     (output / "worker.mjs").write_text(worker_source, encoding="utf-8")
@@ -344,7 +357,7 @@ def build(output, origin, local, platform="workers"):
         },
     }
     (output / "wrangler.jsonc").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
-    return len(PAGES) - 1 + len(OTHER_TEXT) + len(list((public / "assets/img").iterdir())) + 1
+    return len(PAGES) - 1 + len(OTHER_TEXT) + len(REVIEW_PAGES) + len(list((public / "assets/img").iterdir())) + 1
 
 
 if __name__ == "__main__":
