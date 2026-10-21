@@ -201,6 +201,38 @@ class SiteTests(unittest.TestCase):
         self.assertIn('class="hero hero-split"', home)
         self.assertIn('class="site-nav"', home)
 
+    def test_current_public_booking_and_practice_facts(self):
+        current_booking = "https://emilypotts.janeapp.com/"
+        for page in ROOT.rglob("*.html"):
+            if "cloudflare-prototype" in page.parts or "design-variants" in page.parts:
+                continue
+            html = page.read_text(encoding="utf-8")
+            self.assertNotIn("peakresilience.janeapp.com", html, str(page))
+            self.assertNotIn("free 15-minute", html.lower(), str(page))
+            self.assertNotIn("All in-person services are provided out of Peak Resilience", html, str(page))
+            if "Book Now" in html:
+                self.assertIn(f'href="{current_booking}"', html, str(page))
+                self.assertIn("In-person sessions are available in North Vancouver, BC.", html, str(page))
+
+        home = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="https://emilypotts.janeapp.com/#/discipline/1/treatment/1"', home)
+        self.assertIn("free 20-minute consultations", home)
+        for relative in ("about/index.html", "services-and-fees/index.html"):
+            self.assertIn(
+                'href="https://emilypotts.janeapp.com/#/staff_member/1/treatment/1"',
+                (ROOT / relative).read_text(encoding="utf-8"),
+            )
+        contact = (ROOT / "contact/index.html").read_text(encoding="utf-8")
+        self.assertIn(f'href="{current_booking}"', contact)
+        faqs = (ROOT / "faqs/index.html").read_text(encoding="utf-8")
+        self.assertIn("24 hours&rsquo; notice", faqs)
+        self.assertNotIn("48 hours", faqs)
+        self.assertNotIn("100-minute", faqs)
+        self.assertNotIn("ICBC", faqs)
+        services = (ROOT / "services-and-fees/index.html").read_text(encoding="utf-8")
+        self.assertIn("Couples &amp; Relationships", services)
+        self.assertNotIn("ICBC", services)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -25,6 +25,9 @@ PAGES = (
     "resources/index.html", "resources/Blog Post Title One-y2epy-y63ns/index.html",
     "resources/exploring-solutions-for-climate-anxiety/index.html",
     "services-and-fees/index.html", "speaking/index.html", "therapy/index.html",
+    "design-variants/open-shore/index.html",
+    "design-variants/in-good-company/index.html",
+    "design-variants/clear-practice/index.html",
 )
 OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js")
 CONTACT_NOTICE = (

@@ -210,4 +210,48 @@ await check('site pages, machine files, styles, script, and hero image serve cor
   assert.equal(post.response.status, 405);
 });
 
+await check('booking, consultation duration, and practical policies match current published site', async () => {
+  const paths = ['/', '/about/', '/services-and-fees/', '/contact/', '/faqs/',
+    '/speaking/', '/therapy/', '/resources/', '/privacy-page/',
+    '/resources/Blog Post Title One-y2epy-y63ns/',
+    '/resources/exploring-solutions-for-climate-anxiety/'];
+  for (const path of paths) {
+    const { response, body } = await get(path, 'text/html');
+    assert.equal(response.status, 200, path);
+    assert.match(body, /href="https:\/\/emilypotts\.janeapp\.com\/"[^>]*>Book Now<\/a>/, path);
+    assert.doesNotMatch(body, /peakresilience\.janeapp\.com|free 15-minute|out of Peak Resilience/i, path);
+    assert.match(body, /In-person sessions are available in North Vancouver, BC\./, path);
+  }
+  const home = await get('/', 'text/html');
+  const markdown = await get('/', 'text/markdown');
+  assert.match(home.body, /https:\/\/emilypotts\.janeapp\.com\/#\/discipline\/1\/treatment\/1/);
+  assert.match(markdown.body, /https:\/\/emilypotts\.janeapp\.com\/#\/discipline\/1\/treatment\/1/);
+  assert.doesNotMatch(markdown.body, /peakresilience\.janeapp\.com|15-minute/);
+  const about = await get('/about/');
+  const services = await get('/services-and-fees/');
+  assert.match(about.body, /emilypotts\.janeapp\.com\/#\/staff_member\/1\/treatment\/1/);
+  assert.match(services.body, /emilypotts\.janeapp\.com\/#\/staff_member\/1\/treatment\/1/);
+  assert.match(services.body, /Couples &amp; Relationships/);
+  assert.doesNotMatch(services.body, /ICBC/);
+  const faq = await get('/faqs/');
+  assert.match(faq.body, /24 hours&rsquo; notice/);
+  assert.doesNotMatch(faq.body, /48 hours|100-minute|ICBC/);
+});
+
+await check('three review concepts have usable public pages and safe booking links', async () => {
+  for (const name of ['open-shore', 'in-good-company', 'clear-practice']) {
+    const path = `/design-variants/${name}/`;
+    const { response, body } = await get(path, 'text/html');
+    assert.equal(response.status, 200, path);
+    assert.equal(contentType(response), 'text/html', path);
+    assert.match(body, /<h1[ >]/i, path);
+    assert.match(body, /name="robots" content="noindex, nofollow"/, path);
+    assert.match(body, /href="https:\/\/emilypotts\.janeapp\.com\//, path);
+    assert.match(body, /href="\/privacy-page\/"/, path);
+    assert.match(body, /BC Crisis Centre/, path);
+    assert.doesNotMatch(body, /peakresilience|15-minute|48 hours|100-minute|ICBC/i, path);
+    assert.match(body, /@media/i, path);
+  }
+});
+
 console.log(`${checks} local Cloudflare ${isPages ? 'Pages' : 'Worker'} checks passed`);
