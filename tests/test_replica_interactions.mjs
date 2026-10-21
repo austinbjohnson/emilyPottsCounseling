@@ -76,6 +76,7 @@ function setup({ reduce = false, noObserver = false } = {}) {
   if (!noObserver) window.IntersectionObserver = IntersectionObserver;
   runInNewContext(script, { document, window, IntersectionObserver, requestAnimationFrame: callback => callback() });
   return { trigger, visible, later, observed, dialogs, timers, highResolution,
+    document,
     get entranceObserver() { return entranceObserver; }, motionChange: value => motionChange?.({ matches: value }) };
 }
 
@@ -83,6 +84,9 @@ assert.match(services, /data-sqsp-image-block-lightbox-button[\s\S]*?data-lightb
 assert.match(services, /data-image-dimensions="2500x1875"/);
 assert.match(css, /\.replica-entrance-pending\s*\{\s*opacity:\s*0\s*!important/);
 assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.replica-image-dialog, \.replica-entrance-pending\s*\{\s*opacity:\s*1\s*!important/);
+assert.match(css, /\.replica-image-dialog--open::backdrop \{ background: rgba\(0, 0, 0, \.95\); \}/);
+assert.match(css, /max-width: calc\(100vw - 48px\)/);
+assert.match(css, /@media \(max-width: 800px\)[\s\S]*max-width: calc\(100vw - 16px\)/);
 
 const normal = setup();
 assert.equal(normal.visible.classList.contains('replica-entrance-pending'), false, 'above-fold text stays visible');
@@ -95,6 +99,7 @@ normal.trigger.dispatch('click');
 const dialog = normal.dialogs[0];
 const [close, large] = dialog.children;
 assert.equal(dialog.open, true);
+assert.equal(normal.document.documentElement.classList.contains('replica-image-open'), true);
 assert.equal(dialog['aria-label'], 'Full size image');
 assert.equal(close['aria-label'], 'Close image');
 assert.equal(close.focused, true);
@@ -107,6 +112,7 @@ assert.equal(defaultPrevented, true, 'Escape uses the same close transition');
 assert.equal(normal.timers.length, 1);
 normal.timers[0]();
 assert.equal(dialog.removed, true);
+assert.equal(normal.document.documentElement.classList.contains('replica-image-open'), false);
 assert.equal(normal.trigger.focused, true, 'focus returns to the image button');
 
 const reduced = setup({ reduce: true });
@@ -116,6 +122,7 @@ const reducedDialog = reduced.dialogs[0];
 assert.equal(reducedDialog.classList.contains('replica-image-dialog--open'), true);
 reducedDialog.children[0].dispatch('click');
 assert.equal(reducedDialog.removed, true, 'reduced motion closes without waiting');
+assert.equal(reduced.document.documentElement.classList.contains('replica-image-open'), false);
 assert.equal(reduced.timers.length, 0);
 
 const changed = setup();

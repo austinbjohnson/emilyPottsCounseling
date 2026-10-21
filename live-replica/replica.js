@@ -123,10 +123,12 @@
         dismiss();
       });
       dialog.addEventListener('close', () => {
+        document.documentElement.classList.remove('replica-image-open');
         dialog.remove();
         button.focus();
       });
       document.body.append(dialog);
+      document.documentElement.classList.add('replica-image-open');
       dialog.showModal();
       close.focus();
       if (reducedMotion.matches) dialog.classList.add('replica-image-dialog--open');

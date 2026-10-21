@@ -235,8 +235,8 @@ await check('live public routes and safe external links are preserved', async ()
     assert.equal(response.status, 200, path);
     assert.match(body, /https:\/\/emilypotts\.janeapp\.com\//, path);
     assert.match(body, /href="\/about"/, path);
-    assert.match(body, /\/live-replica\/replica\.css\?v=9/, path);
-    assert.match(body, /\/live-replica\/replica\.js\?v=9/, path);
+    assert.match(body, /\/live-replica\/replica\.css\?v=10/, path);
+    assert.match(body, /\/live-replica\/replica\.js\?v=10/, path);
     assert.match(body, /name="robots" content="noindex,nofollow"/, path);
     assert.doesNotMatch(body, /<form\b|<iframe\b|href="\/(?:live-replica\/)?cart"/i, path);
     const scripts = [...body.matchAll(/<script\b[^>]*>/gi)].map(match => match[0]);

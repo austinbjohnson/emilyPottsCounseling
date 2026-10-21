@@ -37,39 +37,54 @@
   max-height: none;
   border: 0;
   padding: 0;
-  background: #111;
+  background: transparent;
   color: white;
   opacity: 0;
   transition: opacity .6s ease;
 }
+html.replica-image-open { overflow: hidden; }
 .replica-image-dialog[open] { display: grid; place-items: center; }
 .replica-image-dialog--open { opacity: 1; }
-.replica-image-dialog::backdrop { background: #111e; }
+.replica-image-dialog::backdrop {
+  background: transparent;
+  transition: background-color .6s ease;
+}
+.replica-image-dialog--open::backdrop { background: rgba(0, 0, 0, .95); }
 .replica-image-dialog img {
   display: block;
-  max-width: calc(100vw - 4rem);
-  max-height: calc(100dvh - 4rem);
+  max-width: calc(100vw - 48px);
+  max-height: calc(100dvh - 40px);
   width: auto;
   height: auto;
   object-fit: contain;
 }
 .replica-image-dialog__close {
   position: fixed;
-  top: max(1rem, env(safe-area-inset-top));
-  right: max(1rem, env(safe-area-inset-right));
+  top: max(calc(2vh - 10px), env(safe-area-inset-top));
+  left: calc(98vw - 34px);
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 44px;
+  height: 44px;
   border: 0;
-  border-radius: 50%;
-  background: #111a;
+  background: transparent;
   color: white;
-  font: 2rem/1 sans-serif;
+  font: 20px/1 sans-serif;
   cursor: pointer;
 }
-.replica-image-dialog__close:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+.replica-image-dialog__close::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid white;
+  pointer-events: none;
+}
+.replica-image-dialog__close:focus-visible { outline: none; }
+.replica-image-dialog__close:focus-visible::before { border-width: 2px; }
+@media (max-width: 800px) {
+  .replica-image-dialog img { max-width: calc(100vw - 16px); }
+}
 html.replica-js:not(.replica-menu-open) .header-menu { visibility: hidden !important; pointer-events: none !important; }
 html.replica-menu-open .header-menu { visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
 html.replica-menu-open { overflow: hidden; }
@@ -95,4 +110,5 @@ section[data-section-id="680d4d66380d43436001db01"] { padding-bottom: 0 !importa
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .replica-image-dialog, .replica-entrance-pending { opacity: 1 !important; }
+  .replica-image-dialog::backdrop { background: rgba(0, 0, 0, .95) !important; }
 }
