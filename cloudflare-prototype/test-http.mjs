@@ -354,4 +354,65 @@ await check('reference-led geography concept keeps booking and service meaning d
   assert.equal(missing.response.status, 404);
 });
 
+await check('three new review paths keep facts, booking and static content available', async () => {
+  const variants = [
+    ['reading-depth', /data-choice="brief"/, /data-level="full"/, /Registered Clinical Counsellor/],
+    ['meeting-settings', /data-select="walking"/, /data-setting="online"/, /weather permits/],
+    ['short-guide', /data-include="fees"/, /data-part="first"/, /\$174 for 50 minutes/],
+  ];
+  for (const [name, control, content, fact] of variants) {
+    const path = `/design-variants/${name}/`;
+    const { response, body } = await get(path, 'text/html');
+    assert.equal(response.status, 200, path);
+    assert.equal(contentType(response), 'text/html', path);
+    assert.match(body, /<h1[ >]/i, path);
+    assert.match(body, /name="robots" content="noindex,nofollow"/, path);
+    assert.match(body, control, path);
+    assert.match(body, content, path);
+    assert.match(body, fact, path);
+    assert.match(body, /prefers-reduced-motion:reduce/, path);
+    assert.match(body, /https:\/\/emilypotts\.janeapp\.com\/#\/discipline\/1\/treatment\/1/, path);
+    assert.match(body, /href="\/about\/"/, path);
+    assert.match(body, /href="\/services-and-fees\/"/, path);
+    assert.match(body, /href="\/privacy-page\/"/, path);
+    assert.match(body, /BC Crisis Centre/, path);
+    assert.doesNotMatch(body, /<form\b|<iframe\b|localStorage|sessionStorage|fetch\(/i, path);
+    assert.doesNotMatch(body, /peakresilience|free 15-minute|48 hours|100-minute|ICBC/i, path);
+    const head = await get(path, undefined, { method: 'HEAD' });
+    assert.equal(head.response.status, 200, path);
+    assert.equal(head.body, '', path);
+    const missing = await get(`${path}missing`, 'text/html');
+    assert.equal(missing.response.status, 404, path);
+  }
+});
+
+await check('two quote studies retain wording and accessible typeset attribution', async () => {
+  for (const name of ['quote-handwritten', 'quote-clean']) {
+    const path = `/design-variants/${name}/`;
+    const { response, body } = await get(path, 'text/html');
+    assert.equal(response.status, 200, path);
+    assert.equal(contentType(response), 'text/html', path);
+    assert.match(body, /“Someone once gave me a box full of darkness\. It took me years to understand that this too, was a gift\.”/);
+    assert.match(body, /<blockquote>/);
+    assert.match(body, /<cite>Mary Oliver<\/cite>/);
+    assert.match(body, /href="\/design-variants\/quote-(?:handwritten|clean)\/"/);
+    assert.match(body, /name="robots" content="noindex,nofollow"/);
+    assert.doesNotMatch(body, /<img\b|<svg\b|data:image|Mary Oliver's signature/i);
+  }
+  const handwritten = await get('/design-variants/quote-handwritten/');
+  const clean = await get('/design-variants/quote-clean/');
+  const reading = await get('/design-variants/reading-depth/');
+  assert.match(handwritten.body, /assets\/fonts\/Caveat-variable\.ttf/);
+  assert.match(handwritten.body, /not a reproduction of Mary Oliver’s signature/);
+  assert.doesNotMatch(clean.body, /Caveat-variable/);
+  assert.match(reading.body, /class="quote-study" data-level="full"/);
+  assert.match(reading.body, /<cite>Mary Oliver<\/cite>/);
+  const font = await get('/assets/fonts/Caveat-variable.ttf');
+  const license = await get('/assets/fonts/OFL-Caveat.txt');
+  assert.equal(font.response.status, 200);
+  assert.ok(font.body.length > 100000);
+  assert.equal(license.response.status, 200);
+  assert.match(license.body, /SIL OPEN FONT LICENSE Version 1\.1/);
+});
+
 console.log(`${checks} local Cloudflare ${isPages ? 'Pages' : 'Worker'} checks passed`);

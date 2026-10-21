@@ -33,6 +33,11 @@ PAGES = (
     "design-variants/conversation-in-margins/index.html",
     "design-variants/room-to-unfold/index.html",
     "design-variants/near-across/index.html",
+    "design-variants/reading-depth/index.html",
+    "design-variants/meeting-settings/index.html",
+    "design-variants/short-guide/index.html",
+    "design-variants/quote-handwritten/index.html",
+    "design-variants/quote-clean/index.html",
     "live-replica/index.html", "live-replica/home/index.html",
     "live-replica/about/index.html", "live-replica/services-and-fees/index.html",
     "live-replica/speaking/index.html", "live-replica/therapy/index.html",
@@ -42,7 +47,7 @@ PAGES = (
     "live-replica/faqs/index.html", "live-replica/contact/index.html",
     "live-replica/privacy-page/index.html", "live-replica/group-events-1/index.html",
 )
-OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js", "live-replica/replica.css", "live-replica/replica.js")
+OTHER_TEXT = ("llms.txt", "robots.txt", "sitemap.xml", "assets/css/styles.css", "assets/js/main.js", "assets/fonts/OFL-Caveat.txt", "live-replica/replica.css", "live-replica/replica.js")
 LIVE_REPLICA_ROUTES = (
     "", "home", "about", "services-and-fees", "speaking", "therapy",
     "resources", "resources/what-to-know-before-your-first-therapy-session",
@@ -204,6 +209,10 @@ def build(output, origin, local, platform="workers"):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
 
+    font = SOURCE / "assets/fonts/Caveat-variable.ttf"
+    target = public / "assets/fonts" / font.name
+    shutil.copyfile(font, target)
+
     # Promote the public live replica to the preview's normal routes. Only the
     # fresh generated output is written; the older source pages and all design
     # variants remain intact for review. The /live-replica paths remain too.
@@ -317,7 +326,7 @@ def build(output, origin, local, platform="workers"):
         (public / "_routes.json").write_text(json.dumps(routes, indent=2) + "\n", encoding="utf-8")
         # The Pages Direct Upload command needs only the public directory.
         # It creates a separate Pages project and never uses Worker config.
-        return len(PAGES) + len(OTHER_TEXT) + len(list((public / "assets/img").iterdir()))
+        return len(PAGES) + len(OTHER_TEXT) + len(list((public / "assets/img").iterdir())) + 1
     if platform != "workers":
         raise ValueError("Platform must be 'workers' or 'pages'")
     (output / "worker.mjs").write_text(worker_source, encoding="utf-8")
@@ -335,7 +344,7 @@ def build(output, origin, local, platform="workers"):
         },
     }
     (output / "wrangler.jsonc").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
-    return len(PAGES) - 1 + len(OTHER_TEXT) + len(list((public / "assets/img").iterdir()))
+    return len(PAGES) - 1 + len(OTHER_TEXT) + len(list((public / "assets/img").iterdir())) + 1
 
 
 if __name__ == "__main__":
