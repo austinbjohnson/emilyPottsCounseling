@@ -53,6 +53,9 @@ REVIEW_PAGES = (
     ("design-variants/em-review-1/index.html", "em-review/1/index.html"),
     ("design-variants/em-review-2/index.html", "em-review/2/index.html"),
     ("design-variants/em-review-3/index.html", "em-review/3/index.html"),
+    ("design-variants/em-review-4/index.html", "em-review/4/index.html"),
+    ("design-variants/em-review-5/index.html", "em-review/5/index.html"),
+    ("design-variants/em-review-6/index.html", "em-review/6/index.html"),
 )
 LIVE_REPLICA_ROUTES = (
     "", "home", "about", "services-and-fees", "speaking", "therapy",

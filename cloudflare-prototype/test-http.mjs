@@ -307,12 +307,13 @@ await check('three review concepts have usable public pages and safe booking lin
   }
 });
 
-await check('Emily review hub and three new directions serve as separate safe paths', async () => {
+await check('Emily review hub and six directions serve as separate safe paths', async () => {
   const hub = await get('/em-review/');
   assert.equal(hub.response.status, 200);
   assert.equal(contentType(hub.response), 'text/html');
   assert.match(hub.body, /name="robots" content="noindex,nofollow"/);
-  for (const path of ['/em-review/1/', '/em-review/2/', '/em-review/3/']) {
+  assert.match(hub.body, /Six ways to make room/);
+  for (const path of ['/em-review/1/', '/em-review/2/', '/em-review/3/', '/em-review/4/', '/em-review/5/', '/em-review/6/']) {
     assert.ok(hub.body.includes(`href="${path}"`), path);
     const { response, body } = await get(path, 'text/html');
     assert.equal(response.status, 200, path);
@@ -331,12 +332,24 @@ await check('Emily review hub and three new directions serve as separate safe pa
   const one = await get('/em-review/1/');
   const two = await get('/em-review/2/');
   const three = await get('/em-review/3/');
+  const four = await get('/em-review/4/');
+  const five = await get('/em-review/5/');
+  const six = await get('/em-review/6/');
   assert.match(one.body, /aria-label="On this page"/);
   assert.match(two.body, /<details class="story">/);
   assert.match(three.body, /<table>/);
   assert.match(three.body, /<td>\$174<\/td>/);
   assert.match(three.body, /<td>\$339<\/td>/);
-  for (const image of ['emily-lakeshore.jpg', 'about-intro-portrait.jpg', 'emily-portrait-1.jpg']) {
+  assert.match(four.body, /class="poster"/);
+  assert.match(four.body, /href="\/services-and-fees\/"/);
+  assert.match(five.body, /class="shore"/);
+  assert.match(five.body, /<details class="story">/);
+  assert.match(six.body, /class="folio"/);
+  assert.equal((six.body.match(/<details>/g) || []).length, 4);
+  assert.equal((six.body.match(/class="leaf"/g) || []).length, 3);
+  assert.match(six.body, /href="\/services-and-fees\/"/);
+  for (const image of ['emily-lakeshore.jpg', 'about-intro-portrait.jpg', 'emily-portrait-1.jpg',
+    'home-olive-branch.jpg', 'home-how-shoreline.jpg', 'services-sunlit-walk.jpg']) {
     const { response } = await get(`/assets/img/${image}`);
     assert.equal(response.status, 200, image);
   }

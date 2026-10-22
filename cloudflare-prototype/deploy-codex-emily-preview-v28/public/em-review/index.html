@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Design review | Emily Potts Counselling</title>
+  <style>
+    :root { color-scheme: light; --ink:#263c37; --paper:#f2f4ec; --line:#9daea3; --blue:#cedde1; --green:#d9e1cf; --warm:#e5dfd2; }
+    *, *::before, *::after { box-sizing:border-box; }
+    html { background:var(--paper); }
+    body { margin:0; color:var(--ink); background:var(--paper); font: 17px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    a { color:inherit; text-underline-offset:.18em; }
+    a:focus-visible { outline:3px solid #385e75; outline-offset:4px; }
+    .skip { position:absolute; transform:translateY(-150%); background:#fff; padding:.7rem 1rem; }
+    .skip:focus { transform:none; }
+    header, main, footer { max-width:1260px; margin:auto; padding-inline:clamp(18px,4vw,56px); }
+    header { min-height:80px; display:flex; align-items:center; justify-content:space-between; gap:20px; border-bottom:1px solid var(--line); }
+    .brand { text-decoration:none; font-family:Georgia,serif; font-size:1.17rem; }
+    nav { display:flex; align-items:center; gap:clamp(12px,3vw,28px); font-size:.9rem; }
+    nav a { padding:12px 0; }
+    main { padding-block:clamp(44px,7vw,100px) 80px; }
+    .intro { max-width:850px; margin-bottom:clamp(42px,6vw,80px); }
+    .eyebrow { margin:0 0 14px; font: 600 .79rem/1.4 ui-monospace,SFMono-Regular,monospace; letter-spacing:.035em; }
+    h1, h2, h3 { font-family:Georgia,"Times New Roman",serif; font-weight:400; letter-spacing:-.045em; }
+    h1 { max-width:13ch; margin:0 0 24px; font-size:clamp(3.1rem,7vw,7rem); line-height:.98; }
+    .intro p:last-child { max-width:52ch; margin:0; }
+    .studies { border-top:1px solid var(--line); }
+    .study { display:grid; grid-template-columns:minmax(0,1fr) minmax(230px,38%); gap:clamp(20px,5vw,72px); align-items:center; padding:clamp(28px,4vw,52px) 0; border-bottom:1px solid var(--line); }
+    .study h3 { margin:0 0 12px; font-size:clamp(2rem,4vw,3.6rem); line-height:1.08; }
+    .study p { max-width:48ch; margin:0 0 24px; }
+    .study .link { display:inline-block; padding:11px 0; font-weight:600; }
+    .study img { display:block; width:100%; height:clamp(200px,28vw,340px); object-fit:cover; }
+    .study:nth-child(1) img { object-position:50% 45%; }
+    .study:nth-child(2) img { object-position:50% 28%; }
+    .study:nth-child(3) img { object-position:50% 50%; }
+    .study:nth-child(1) .image { background:var(--green); padding:12px 12px 0 0; }
+    .study:nth-child(2) .image { background:var(--blue); padding:0 0 12px 12px; }
+    .study:nth-child(3) .image { background:var(--warm); padding:12px; }
+    .group-heading { font-size:clamp(1.4rem,2.4vw,2rem); margin:0 0 20px; }
+    .new-studies { margin-bottom:clamp(62px,9vw,120px); border-top:1px solid var(--line); }
+    .new-study { display:grid; grid-template-columns:minmax(0,1fr) minmax(160px,34%); align-items:stretch; min-height:290px; border-bottom:1px solid var(--line); }
+    .new-study .copy { display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,4vw,52px); }
+    .new-study h3 { font-size:clamp(2.1rem,5vw,4.7rem); line-height:1.02; margin:0 0 16px; }
+    .new-study p { max-width:42ch; margin:0 0 18px; }
+    .new-study a { display:inline-flex; align-items:center; min-height:44px; font-weight:600; width:fit-content; }
+    .new-study img { display:block; width:100%; height:100%; min-height:290px; object-fit:cover; }
+    .new-study:nth-child(1) { background:#e7eadf; }
+    .new-study:nth-child(2) { background:#d9d0de; }
+    .new-study:nth-child(3) { background:#c5d2d5; }
+    .new-study:nth-child(2) img { object-position:75% 48%; }
+    footer { padding-block:30px 50px; font-size:.88rem; }
+    @media(max-width:660px) { header { align-items:flex-start; padding-block:18px; flex-direction:column; gap:6px; } main { padding-top:48px; } .new-study { grid-template-columns:minmax(0,1fr) 31%; min-height:250px; } .new-study .copy { padding:20px 14px; } .new-study h3 { font-size:clamp(1.8rem,8vw,2.8rem); } .new-study p { font-size:.9rem; } .new-study img { min-height:250px; } .study { grid-template-columns:1fr; } .study .image { max-width:440px; } .study img { height:240px; } }
+    @media(max-width:350px) { .new-study { grid-template-columns:1fr; } .new-study img { height:150px; min-height:0; } }
+    @media(prefers-reduced-motion:reduce) { *, *::before, *::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to design studies</a>
+  <header>
+    <a class="brand" href="/">Emily Potts Counselling</a>
+    <nav aria-label="Review navigation"><a href="/">Current copy</a><a href="https://emilypotts.janeapp.com/">Book a consultation</a></nav>
+  </header>
+  <main id="main">
+    <div class="intro">
+      <p class="eyebrow">Design studies for review</p>
+      <h1>Six ways to make room.</h1>
+      <p>Three new compositions sit beside the earlier studies. Each uses Emily’s public words and photographs; the current copy remains available from the link above.</p>
+    </div>
+    <section aria-labelledby="new-directions">
+      <h2 class="group-heading" id="new-directions">New compositions</h2>
+      <div class="new-studies">
+        <section class="new-study" aria-labelledby="study-four"><div class="copy"><h3 id="study-four">Botanical Poster</h3><p>A forest photograph and expansive typography form a quiet, clear poster.</p><a href="/em-review/4/">Explore Botanical Poster</a></div><img src="/assets/img/home-olive-branch.jpg" alt="" loading="lazy"></section>
+        <section class="new-study" aria-labelledby="study-five"><div class="copy"><h3 id="study-five">Along the Shore</h3><p>A photographic shoreline runs alongside a calm lavender reading field.</p><a href="/em-review/5/">Explore Along the Shore</a></div><img src="/assets/img/home-how-shoreline.jpg" alt="" loading="lazy"></section>
+        <section class="new-study" aria-labelledby="study-six"><div class="copy"><h3 id="study-six">Open Folio</h3><p>Connected colour fields offer an at-a-glance way into Emily’s services.</p><a href="/em-review/6/">Explore Open Folio</a></div><img src="/assets/img/services-sunlit-walk.jpg" alt="" loading="lazy"></section>
+      </div>
+    </section>
+    <section aria-labelledby="earlier-directions">
+    <h2 class="group-heading" id="earlier-directions">Earlier directions</h2>
+    <div class="studies">
+      <section class="study" aria-labelledby="study-one">
+        <div><h3 id="study-one">The Clearing</h3><p>A landscape-led entrance with a clear index for finding Emily, therapy, and the next step.</p><a class="link" href="/em-review/1/">Explore The Clearing</a></div>
+        <div class="image"><img src="/assets/img/home-how-shoreline.jpg" alt="" loading="lazy"></div>
+      </section>
+      <section class="study" aria-labelledby="study-two">
+        <div><h3 id="study-two">Beside the Portrait</h3><p>A quieter introduction to Emily, with room to read further when you choose.</p><a class="link" href="/em-review/2/">Explore Beside the Portrait</a></div>
+        <div class="image"><img src="/assets/img/emily-portrait-2.jpg" alt="" loading="lazy"></div>
+      </section>
+      <section class="study" aria-labelledby="study-three">
+        <div><h3 id="study-three">At a Glance</h3><p>A practical, open view of services and fees, grounded in Emily’s nature-based imagery.</p><a class="link" href="/em-review/3/">Explore At a Glance</a></div>
+        <div class="image"><img src="/assets/img/services-hands-lake.jpg" alt="" loading="lazy"></div>
+      </section>
+    </div>
+    </section>
+  </main>
+  <footer>Review concepts only. <a href="/">Return to the current copy.</a></footer>
+</body>
+</html>
